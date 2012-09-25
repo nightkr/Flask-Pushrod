@@ -44,7 +44,7 @@ class Pushrod(object):
             self.mime_type_formatters[mime_type] = formatter
 
     def get_formatter_for_request(self, request=None):
-        if request == None:
+        if request is None:
             request = current_request
 
         if self.format_arg_name in request.args:
@@ -62,9 +62,9 @@ class Pushrod(object):
         raise FormatterNotFound()
 
     def format_response(self, response, formatter=None, formatter_kwargs=None):
-        if formatter == None:
+        if formatter is None:
             formatter = self.get_formatter_for_request()
-        if formatter_kwargs == None:
+        if formatter_kwargs is None:
             formatter_kwargs = {}
 
         if not isinstance(response, BaseResponse):
