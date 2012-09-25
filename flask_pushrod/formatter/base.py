@@ -1,3 +1,6 @@
+from werkzeug.exceptions import BadRequest
+
+
 def formatter(name=None, mime_type=None):
     """
     Flags a function as a Pushrod formatter.
@@ -22,3 +25,9 @@ def formatter(name=None, mime_type=None):
         return f
 
     return decorator
+
+
+class FormatterNotFound(BadRequest):
+    def __init__(self):
+        super(FormatterNotFound, self).__init__(self,
+            u"The requested formatter does not exist")
