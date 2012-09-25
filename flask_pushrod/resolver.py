@@ -2,7 +2,7 @@ from flask import Response, current_app, request as current_request
 
 from werkzeug.wrappers import BaseResponse
 
-from .formatter import FormatterNotFound
+from .formatters import FormatterNotFound
 
 from functools import wraps
 import importlib
