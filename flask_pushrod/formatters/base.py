@@ -1,5 +1,21 @@
 from werkzeug.exceptions import BadRequest
 
+from flask import Response
+
+
+class UnformattedResponse(object):
+    formatted_class = Response
+
+    def __init__(self, response=None, status=None, headers=None):
+        self.response = response
+        self.status = status
+        self.headers = headers
+
+    def formatted(self, formatted_response, mime_type):
+        return self.formatted_class(formatted_response,
+            self.status, self.headers,
+            mime_type)
+
 
 def formatter(name=None, mime_type=None):
     """

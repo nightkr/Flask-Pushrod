@@ -1,2 +1,2 @@
 from . import base
-from .base import FormatterNotFound, formatter
+from .base import UnformattedResponse, FormatterNotFound, formatter

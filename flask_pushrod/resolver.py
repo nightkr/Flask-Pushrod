@@ -1,8 +1,6 @@
 from flask import Response, current_app, request as current_request
 
-from werkzeug.wrappers import BaseResponse
-
-from .formatters import FormatterNotFound
+from .formatters import FormatterNotFound, UnformattedResponse
 
 from functools import wraps
 import importlib
@@ -55,9 +53,12 @@ class Pushrod(object):
 
             return self.named_formatters[formatter_name]
 
-        for mime_type in request.accept.itervalues():
+        for mime_type in request.accept_mimetypes.itervalues():
             if mime_type in self.mime_type_formatters:
                 return self.mime_type_formatters[mime_type]
+
+        if self.default_formatter:
+            return self.default_formatter
 
         raise FormatterNotFound()
 
@@ -67,12 +68,12 @@ class Pushrod(object):
         if formatter_kwargs is None:
             formatter_kwargs = {}
 
-        if not isinstance(response, BaseResponse):
+        if not isinstance(response, UnformattedResponse):
             if isinstance(response, tuple):
                 response_raw, status, headers = response
-                response = Response(response, status, headers)
+                response = UnformattedResponse(response, status, headers)
             else:
-                response = Response(response)
+                response = UnformattedResponse(response)
 
         formatted = formatter(response, **formatter_kwargs)
 
@@ -87,7 +88,7 @@ def pushrod_view(**formatter_kwargs):
     def decorator(f):
         @wraps(f)
         def wrapper(*view_args, **view_kwargs):
-            response = current_app.make_response(f(*view_args, **view_kwargs))
+            response = f(*view_args, **view_kwargs)
             return current_app.pushrod.format_response(response, formatter_kwargs=formatter_kwargs)
 
         return wrapper
