@@ -61,9 +61,11 @@ class Pushrod(object):
 
         raise FormatterNotFound()
 
-    def format_response(self, response, formatter=None):
+    def format_response(self, response, formatter=None, formatter_kwargs=None):
         if formatter == None:
             formatter = self.get_formatter_for_request()
+        if formatter_kwargs == None:
+            formatter_kwargs = {}
 
         if not isinstance(response, BaseResponse):
             if isinstance(response, tuple):
@@ -72,7 +74,7 @@ class Pushrod(object):
             else:
                 response = Response(response)
 
-        formatted = formatter(response)
+        formatted = formatter(response, **formatter_kwargs)
 
         return formatted
 
@@ -86,7 +88,7 @@ def pushrod_view(**formatter_kwargs):
         @wraps(f)
         def wrapper(*view_args, **view_kwargs):
             response = current_app.make_response(f(*view_args, **view_kwargs))
-            return current_app.pushrod.format_response(response)
+            return current_app.pushrod.format_response(response, formatter_kwargs=formatter_kwargs)
 
         return wrapper
 
