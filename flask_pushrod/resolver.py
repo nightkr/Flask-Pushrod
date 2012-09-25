@@ -77,7 +77,7 @@ class Pushrod(object):
         return formatted
 
 
-def view(**formatter_kwargs):
+def pushrod_view(**formatter_kwargs):
     """
     Decorator for views that should be passed through Pushrod.
     """

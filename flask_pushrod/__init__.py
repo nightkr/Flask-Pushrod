@@ -1,3 +1,3 @@
-from .resolver import Pushrod, view
+from .resolver import Pushrod, pushrod_view
 
 from . import formatter
