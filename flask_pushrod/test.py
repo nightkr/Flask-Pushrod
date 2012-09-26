@@ -107,3 +107,5 @@ class PushrodFormatterTestCase(PushrodTestCase):
             test_response, json_formatter)
 
         assert regular == formatted.data
+
+        json.loads(formatted.data)
