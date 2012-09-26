@@ -48,10 +48,8 @@ class PushrodResolverTestCase(PushrodTestCase):
             return test_response
 
         test_view_raw_dict_response = self.client.get("/raw_dict")
-        assert test_view_raw_dict_response.status_code == 200, \
-            "Invalid status code returned from dict-returning view"
-        assert test_view_raw_dict_response.data == repr(test_response), \
-            "Invalid data returned from dict-returning view"
+        assert test_view_raw_dict_response.status_code == 200
+        assert test_view_raw_dict_response.data == repr(test_response)
 
     def test_response_data(self):
         @self.app.route("/200_response")
@@ -65,16 +63,12 @@ class PushrodResolverTestCase(PushrodTestCase):
             return UnformattedResponse(test_response, 404)
 
         test_view_200_response = self.client.get("/200_response")
-        assert test_view_200_response.status_code == 200, \
-            "Invalid status code returned from 200-returning view"
-        assert test_view_200_response.data == repr(test_response), \
-            "Invalid data returned from 200-returning view"
+        assert test_view_200_response.status_code == 200
+        assert test_view_200_response.data == repr(test_response)
 
         test_view_404_response = self.client.get("/404_response")
-        assert test_view_404_response.status_code == 404, \
-            "Invalid status code returned from 404-returning view"
-        assert test_view_404_response.data == repr(test_response), \
-            "Invalid data returned from 404-returning view"
+        assert test_view_404_response.status_code == 404
+        assert test_view_404_response.data == repr(test_response)
 
     def test_response_bypass(self):
         @self.app.route("/raw_string")
@@ -88,16 +82,12 @@ class PushrodResolverTestCase(PushrodTestCase):
             return Response("test")
 
         test_raw_string_response = self.client.get("/raw_string")
-        assert test_raw_string_response.status_code == 200, \
-            "Invalid status code returned from raw string view"
-        assert test_raw_string_response.data == "test", \
-            "Invalid data returned from raw string view"
+        assert test_raw_string_response.status_code == 200
+        assert test_raw_string_response.data == "test"
 
         test_regular_response_response = self.client.get("/regular_response")
-        assert test_regular_response_response.status_code == 200, \
-            "Invalid status code returned from regular response view"
-        assert test_regular_response_response.data == "test", \
-            "Invalid data returned from regular response view"
+        assert test_regular_response_response.status_code == 200
+        assert test_regular_response_response.data == "test"
 
 
 class PushrodFormatterTestCase(PushrodTestCase):
