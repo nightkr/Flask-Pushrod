@@ -1,4 +1,5 @@
 from flask import Response, current_app, request as current_request
+from werkzeug.wrappers import BaseResponse
 
 from .formatters import FormatterNotFound, UnformattedResponse
 
@@ -67,6 +68,9 @@ class Pushrod(object):
             formatter = self.get_formatter_for_request()
         if formatter_kwargs is None:
             formatter_kwargs = {}
+
+        if isinstance(response, (basestring, BaseResponse)):
+            return response
 
         if not isinstance(response, UnformattedResponse):
             if isinstance(response, tuple):
