@@ -1,10 +1,10 @@
-from flask import Response, current_app, request as current_request
+from flask import current_app, request as current_request
 from werkzeug.wrappers import BaseResponse
 
+from . import formatters
 from .formatters import FormatterNotFound, UnformattedResponse
 
 from functools import wraps
-import importlib
 
 
 class Pushrod(object):
@@ -17,8 +17,7 @@ class Pushrod(object):
 
         for formatter in formatters:
             if isinstance(formatter, basestring):
-                formatter_module = importlib.import_module('flask.ext.pushrod.%s' % formatter)
-                formatter = getattr(formatter_module, '%s_formatter' % formatter)
+                formatter = getattr(formatters, '%s_formatter' % formatter)
 
             self.register_formatter(formatter)
 

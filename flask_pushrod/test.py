@@ -2,8 +2,10 @@ from flask import Flask, Response
 
 from .resolver import Pushrod, pushrod_view
 from .formatters.base import formatter, UnformattedResponse
+from .formatters.json import json_formatter
 
 from unittest import TestCase
+import json
 
 
 test_response = {
@@ -96,3 +98,12 @@ class PushrodResolverTestCase(PushrodTestCase):
             "Invalid status code returned from regular response view"
         assert test_regular_response_response.data == "test", \
             "Invalid data returned from regular response view"
+
+
+class PushrodFormatterTestCase(PushrodTestCase):
+    def test_json_formatter(self):
+        regular = json.dumps(test_response)
+        formatted = self.app.pushrod.format_response(
+            test_response, json_formatter)
+
+        assert regular == formatted.data
