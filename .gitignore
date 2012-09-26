@@ -1,2 +1,5 @@
 *.pyc
 *.sublime-workspace
+*.egg-info/*
+build
+dist
