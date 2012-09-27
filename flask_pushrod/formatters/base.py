@@ -45,5 +45,5 @@ def formatter(name=None, mime_type=None):
 
 class FormatterNotFound(BadRequest):
     def __init__(self):
-        super(FormatterNotFound, self).__init__(self,
+        super(FormatterNotFound, self).__init__(
             u"The requested formatter does not exist")

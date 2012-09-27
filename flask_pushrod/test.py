@@ -1,7 +1,9 @@
 from flask import Flask, Response
 
+from nose.tools import raises
+
 from .resolver import Pushrod, pushrod_view
-from .formatters.base import formatter, UnformattedResponse
+from .formatters.base import formatter, UnformattedResponse, FormatterNotFound
 from .formatters.json import json_formatter
 
 from unittest import TestCase
@@ -88,6 +90,20 @@ class PushrodResolverTestCase(PushrodTestCase):
         test_regular_response_response = self.client.get("/regular_response")
         assert test_regular_response_response.status_code == 200
         assert test_regular_response_response.data == "test"
+
+    @raises(FormatterNotFound)
+    def test_formatter_not_found(self):
+        @self.app.route("/")
+        @pushrod_view()
+        def test_formatter_not_found_view():
+            return {}
+
+        response = self.client.get("/?format=none")
+        assert response.status_code == 400, \
+            "Status code returned from an unexistant formatter should be 400 (bad request)"
+
+        with self.app.test_request_context("/?format=none"):
+            self.app.pushrod.format_response(test_formatter_not_found_view(), "none")
 
 
 class PushrodFormatterTestCase(PushrodTestCase):
