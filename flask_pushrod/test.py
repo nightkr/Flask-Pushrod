@@ -99,8 +99,8 @@ class PushrodResolverTestCase(PushrodTestCase):
             return {}
 
         response = self.client.get("/?format=none")
-        assert response.status_code == 400, \
-            "Status code returned from an unexistant formatter should be 400 (bad request)"
+        assert response.status_code == 406, \
+            "Status code returned from an unexistant formatter should be 406 (not acceptable)"
 
         with self.app.test_request_context("/?format=none"):
             self.app.pushrod.format_response(test_formatter_not_found_view(), "none")

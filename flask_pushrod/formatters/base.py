@@ -1,4 +1,4 @@
-from werkzeug.exceptions import BadRequest
+from werkzeug.exceptions import NotAcceptable
 
 from flask import Response
 
@@ -43,7 +43,7 @@ def formatter(name=None, mime_type=None):
     return decorator
 
 
-class FormatterNotFound(BadRequest):
+class FormatterNotFound(NotAcceptable):
     def __init__(self):
         super(FormatterNotFound, self).__init__(
             u"The requested formatter does not exist")
