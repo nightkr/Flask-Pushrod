@@ -103,8 +103,7 @@ class PushrodResolverTestCase(PushrodTestCase):
             "Status code returned from an unexistant formatter should be 406 (not acceptable)"
 
         with self.app.test_request_context("/?format=none"):
-            pass
-            #self.app.pushrod.format_response(test_formatter_not_found_view(), "none")
+            self.app.pushrod.format_response(test_formatter_not_found_view(), "none")
 
 
 class PushrodFormatterTestCase(PushrodTestCase):
