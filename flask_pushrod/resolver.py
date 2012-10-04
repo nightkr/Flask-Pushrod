@@ -10,12 +10,14 @@ from functools import wraps
 class Pushrod(object):
     """
     The main resolver class for Pushrod.
+
+    :param formatters: A tuple of formatters that are registered immediately (can also be strings, which are currently expanded to flask.ext.pushrod.formatters.%s_formatter)
     """
 
     #: The query string argument checked for an explicit formatter (to override header-based content type negotiation).
     format_arg_name = "format"
 
-    def __init__(self, app=None, formatters=[], default_formatter=None):
+    def __init__(self, app=None, formatters=('json'), default_formatter=None):
         self.mime_type_formatters = {}
         self.named_formatters = {}
         self.default_formatter = None
