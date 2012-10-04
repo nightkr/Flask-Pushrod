@@ -8,6 +8,11 @@ from functools import wraps
 
 
 class Pushrod(object):
+    """
+    The main resolver class for Pushrod.
+    """
+
+    #: The query string argument checked for an explicit formatter (to override header-based content type negotiation).
     format_arg_name = "format"
 
     def __init__(self, app=None, formatters=[], default_formatter=None):
@@ -29,9 +34,17 @@ class Pushrod(object):
             self.init_app(app)
 
     def init_app(self, app):
+        """
+        Registers the Pushrod resolver with the Flask app (can also be done by passing the app to the constructor).
+        """
+
         app.pushrod = self
 
     def register_formatter(self, formatter, default=False):
+        """
+        Registers a formatter with the Pushrod resolver (can also be done by passing the formatter to the constructor).
+        """
+
         if not formatter._is_pushrod_formatter:
             raise TypeError(u'Got passed an invalid formatter')
 
@@ -42,6 +55,13 @@ class Pushrod(object):
             self.mime_type_formatters[mime_type] = formatter
 
     def get_formatter_for_request(self, request=None):
+        """
+        Inspects a Flask :class:`~flask.Request` for hints regarding what formatter to use.
+
+        :throws FormatterNotFound: If a usable formatter could not be found (explicit formatter argument points to an invalid format, or no acceptable mime types can be used as targets and there is no default formatter)
+        :param request: The request to be inspected (defaults to :obj:`flask.request`)
+        """
+
         if request is None:
             request = current_request
 
@@ -63,6 +83,17 @@ class Pushrod(object):
         raise FormatterNotFound()
 
     def format_response(self, response, formatter=None, formatter_kwargs=None):
+        """
+        Formats an unformatted response (a bare value, a (response, status, headers)-:obj:`tuple`, or an :class:`~flask.ext.pushrod.formatters.UnformattedResponse` object).
+
+        :param response: The response to format
+        :param formatter: The formatter to use (defaults to using :meth:`get_formatter_for_request`)
+        :param formatter_kwargs: Any extra arguments to pass to the formatter
+
+        .. note::
+           For convenience, a bare string (:obj:`unicode`, :obj:`str`, or any other :obj:`basestring` derivative), or a derivative of :class:`werkzeug.wrappers.BaseResponse` (such as :class:`flask.Response`) is passed through unchanged.
+        """
+
         if formatter is None:
             formatter = self.get_formatter_for_request()
         if formatter_kwargs is None:
@@ -85,7 +116,9 @@ class Pushrod(object):
 
 def pushrod_view(**formatter_kwargs):
     """
-    Decorator for views that should be passed through Pushrod.
+    Decorator that wraps view functions and formats their responses through :meth:`flask.ext.pushrod.Pushrod.format_response`.
+
+    :param formatter_kwargs: Any extra arguments to pass to the formatter
     """
 
     def decorator(f):
