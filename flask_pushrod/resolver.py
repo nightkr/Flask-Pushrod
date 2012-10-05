@@ -1,7 +1,7 @@
 from flask import current_app, request as current_request
 from werkzeug.wrappers import BaseResponse
 
-from . import formatters
+from . import formatters as _formatters
 from .formatters import FormatterNotFound, UnformattedResponse
 
 from functools import wraps
@@ -24,7 +24,7 @@ class Pushrod(object):
 
         for formatter in formatters:
             if isinstance(formatter, basestring):
-                formatter = getattr(formatters, '%s_formatter' % formatter)
+                formatter = getattr(_formatters, '%s_formatter' % formatter)
 
             self.register_formatter(formatter)
 
@@ -56,12 +56,12 @@ class Pushrod(object):
         for mime_type in formatter.formatter_mime_types:
             self.mime_type_formatters[mime_type] = formatter
 
-    def get_formatter_for_request(self, request=None):
+    def get_formatters_for_request(self, request=None):
         """
         Inspects a Flask :class:`~flask.Request` for hints regarding what formatter to use.
 
-        :throws FormatterNotFound: If a usable formatter could not be found (explicit formatter argument points to an invalid format, or no acceptable mime types can be used as targets and there is no default formatter)
         :param request: The request to be inspected (defaults to :obj:`flask.request`)
+        :returns: List of matching formatters, in order of user preference
         """
 
         if request is None:
@@ -70,34 +70,37 @@ class Pushrod(object):
         if self.format_arg_name in request.args:
             formatter_name = request.args[self.format_arg_name]
 
-            if formatter_name not in self.named_formatters:
-                raise FormatterNotFound()
+            if formatter_name in self.named_formatters:
+                return [self.named_formatters[formatter_name]]
+            else:
+                return []
 
-            return self.named_formatters[formatter_name]
-
-        for mime_type in request.accept_mimetypes.itervalues():
-            if mime_type in self.mime_type_formatters:
-                return self.mime_type_formatters[mime_type]
+        matching_formatters = [self.mime_type_formatters[mime_type]
+                               for mime_type in request.accept_mimetypes.itervalues()
+                               if mime_type in self.mime_type_formatters]
 
         if self.default_formatter:
-            return self.default_formatter
+            matching_formatters.append(self.default_formatter)
 
-        raise FormatterNotFound()
+        return matching_formatters
 
     def format_response(self, response, formatter=None, formatter_kwargs=None):
         """
         Formats an unformatted response (a bare value, a (response, status, headers)-:obj:`tuple`, or an :class:`~flask.ext.pushrod.formatters.UnformattedResponse` object).
 
+        :throws FormatterNotFound: If a usable formatter could not be found (explicit formatter argument points to an invalid format, or no acceptable mime types can be used as targets and there is no default formatter)
         :param response: The response to format
         :param formatter: The formatter to use (defaults to using :meth:`get_formatter_for_request`)
         :param formatter_kwargs: Any extra arguments to pass to the formatter
 
         .. note::
            For convenience, a bare string (:obj:`unicode`, :obj:`str`, or any other :obj:`basestring` derivative), or a derivative of :class:`werkzeug.wrappers.BaseResponse` (such as :class:`flask.Response`) is passed through unchanged.
+        .. note::
+           A formatter may mark itself as unable to format a specific response by returning :obj:`None`, in which case the next possible formatter is attempted.
         """
 
-        if formatter is None:
-            formatter = self.get_formatter_for_request()
+        formatters = [formatter] if formatter else self.get_formatters_for_request()
+
         if formatter_kwargs is None:
             formatter_kwargs = {}
 
@@ -111,9 +114,13 @@ class Pushrod(object):
             else:
                 response = UnformattedResponse(response)
 
-        formatted = formatter(response, **formatter_kwargs)
+        for formatter in formatters:
+            formatted = formatter(response, **formatter_kwargs)
 
-        return formatted
+            if formatted is not None:
+                return formatted
+
+        raise FormatterNotFound()
 
 
 def pushrod_view(**formatter_kwargs):
