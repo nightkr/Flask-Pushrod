@@ -22,8 +22,8 @@ Formatters
 
 .. autofunction:: formatter
 
-Included Formatters
-^^^^^^^^^^^^^^^^^^^
+Bundled Formatters
+^^^^^^^^^^^^^^^^^^
 
 .. autofunction:: json_formatter
 
