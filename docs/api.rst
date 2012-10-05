@@ -22,6 +22,9 @@ Formatters
 
 .. autofunction:: formatter
 
+.. autoclass:: flask.ext.pushrod.formatters.UnformattedResponse
+   :members:
+
 Bundled Formatters
 ^^^^^^^^^^^^^^^^^^
 
