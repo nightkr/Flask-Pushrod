@@ -26,6 +26,7 @@ Bundled Formatters
 ^^^^^^^^^^^^^^^^^^
 
 .. autofunction:: json_formatter
+.. autofunction:: jinja2_formatter
 
 Exceptions
 ----------

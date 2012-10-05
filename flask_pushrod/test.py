@@ -26,7 +26,7 @@ test_response = {
 
 
 @formatter('repr')
-def repr_formatter(unformatted):
+def repr_formatter(unformatted, **kwargs):
     return unformatted.formatted(repr(unformatted.response), "text/plain")
 
 
