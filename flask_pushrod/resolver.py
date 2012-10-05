@@ -17,7 +17,7 @@ class Pushrod(object):
     #: The query string argument checked for an explicit formatter (to override header-based content type negotiation).
     format_arg_name = "format"
 
-    def __init__(self, app=None, formatters=('json',), default_formatter=None):
+    def __init__(self, app=None, formatters=('json', 'jinja2',), default_formatter=None):
         self.mime_type_formatters = {}
         self.named_formatters = {}
         self.default_formatter = None
