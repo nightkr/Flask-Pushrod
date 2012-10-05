@@ -7,7 +7,7 @@ import flask
 
 
 @formatter('html', 'text/html')
-def jinja2_formatter(unformatted, template=None, **kwargs):
+def jinja2_formatter(unformatted, jinja_template=None, **kwargs):
     """
     Formats a response using :func:`flask.render_template`.
 
@@ -15,7 +15,7 @@ def jinja2_formatter(unformatted, template=None, **kwargs):
     :Formatter name triggers: - html
     """
 
-    if template:
+    if jinja_template:
         return unformatted.formatted(
-            flask.render_template(**unformatted.response),
+            flask.render_template(jinja_template, **unformatted.response),
             'application/json')
