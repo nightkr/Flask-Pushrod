@@ -1,4 +1,4 @@
 from .resolver import Pushrod, pushrod_view
-from .formatters import UnformattedResponse
+from .renderers import UnrenderedResponse
 
-from . import formatters, resolver
+from . import renderers, resolver

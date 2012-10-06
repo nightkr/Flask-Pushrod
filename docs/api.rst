@@ -15,23 +15,23 @@ Views
 
 .. autofunction:: pushrod_view
 
-Formatters
+Renderers
 ----------
 
-.. automodule:: flask.ext.pushrod.formatters
+.. automodule:: flask.ext.pushrod.renderers
 
-.. autofunction:: formatter
+.. autofunction:: renderer
 
-.. autoclass:: flask.ext.pushrod.formatters.UnformattedResponse
+.. autoclass:: flask.ext.pushrod.renderers.UnrenderedResponse
    :members:
 
-Bundled Formatters
+Bundled Renderers
 ^^^^^^^^^^^^^^^^^^
 
-.. autofunction:: json_formatter
-.. autofunction:: jinja2_formatter
+.. autofunction:: json_renderer
+.. autofunction:: jinja2_renderer
 
 Exceptions
 ----------
 
-.. autoexception:: flask.ext.pushrod.formatters.FormatterNotFound
+.. autoexception:: flask.ext.pushrod.renderers.RendererNotFound

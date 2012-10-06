@@ -3,8 +3,8 @@ from flask import Flask, Response
 from nose.tools import raises
 
 from .resolver import Pushrod, pushrod_view
-from .formatters.base import formatter, UnformattedResponse, FormatterNotFound
-from .formatters.json import json_formatter
+from .renderers.base import renderer, UnrenderedResponse, RendererNotFound
+from .renderers.json import json_renderer
 
 from unittest import TestCase
 import json
@@ -25,9 +25,9 @@ test_response = {
 }
 
 
-@formatter('repr')
-def repr_formatter(unformatted, **kwargs):
-    return unformatted.formatted(repr(unformatted.response), "text/plain")
+@renderer('repr')
+def repr_renderer(unrendered, **kwargs):
+    return unrendered.rendered(repr(unrendered.response), "text/plain")
 
 
 class PushrodTestCase(TestCase):
@@ -35,8 +35,8 @@ class PushrodTestCase(TestCase):
         app = Flask(__name__)
         pushrod = Pushrod(app)
 
-        pushrod.register_formatter(repr_formatter)
-        pushrod.default_formatter = repr_formatter
+        pushrod.register_renderer(repr_renderer)
+        pushrod.default_renderer = repr_renderer
 
         self.app = app
         self.client = app.test_client()
@@ -57,12 +57,12 @@ class PushrodResolverTestCase(PushrodTestCase):
         @self.app.route("/200_response")
         @pushrod_view()
         def test_view_200_view():
-            return UnformattedResponse(test_response)
+            return UnrenderedResponse(test_response)
 
         @self.app.route("/404_response")
         @pushrod_view()
         def test_view_404_view():
-            return UnformattedResponse(test_response, 404)
+            return UnrenderedResponse(test_response, 404)
 
         test_view_200_response = self.client.get("/200_response")
         assert test_view_200_response.status_code == 200
@@ -91,27 +91,27 @@ class PushrodResolverTestCase(PushrodTestCase):
         assert test_regular_response_response.status_code == 200
         assert test_regular_response_response.data == "test"
 
-    @raises(FormatterNotFound)
-    def test_formatter_not_found(self):
+    @raises(RendererNotFound)
+    def test_renderer_not_found(self):
         @self.app.route("/")
         @pushrod_view()
-        def test_formatter_not_found_view():
+        def test_renderer_not_found_view():
             return {}
 
         response = self.client.get("/?format=none")
         assert response.status_code == 406, \
-            "Status code returned from an unexistant formatter should be 406 (not acceptable)"
+            "Status code returned from an unexistant renderer should be 406 (not acceptable)"
 
         with self.app.test_request_context("/?format=none"):
-            self.app.pushrod.format_response(test_formatter_not_found_view(), "none")
+            self.app.pushrod.render_response(test_renderer_not_found_view(), "none")
 
 
-class PushrodFormatterTestCase(PushrodTestCase):
-    def test_json_formatter(self):
+class PushrodRendererTestCase(PushrodTestCase):
+    def test_json_renderer(self):
         regular = json.dumps(test_response)
-        formatted = self.app.pushrod.format_response(
-            test_response, json_formatter)
+        rendered = self.app.pushrod.render_response(
+            test_response, json_renderer)
 
-        assert regular == formatted.data
+        assert regular == rendered.data
 
-        json.loads(formatted.data)
+        json.loads(rendered.data)

@@ -1,8 +1,8 @@
 from flask import current_app, request as current_request
 from werkzeug.wrappers import BaseResponse
 
-from . import formatters as _formatters
-from .formatters import FormatterNotFound, UnformattedResponse
+from . import renderers as _renderers
+from .renderers import RendererNotFound, UnrenderedResponse
 
 from functools import wraps
 
@@ -11,26 +11,26 @@ class Pushrod(object):
     """
     The main resolver class for Pushrod.
 
-    :param formatters: A tuple of formatters that are registered immediately (can also be strings, which are currently expanded to flask.ext.pushrod.formatters.%s_formatter)
+    :param renderers: A tuple of renderers that are registered immediately (can also be strings, which are currently expanded to flask.ext.pushrod.renderers.%s_renderer)
     """
 
-    #: The query string argument checked for an explicit formatter (to override header-based content type negotiation).
+    #: The query string argument checked for an explicit renderer (to override header-based content type negotiation).
     format_arg_name = "format"
 
-    def __init__(self, app=None, formatters=('json', 'jinja2',), default_formatter=None):
-        self.mime_type_formatters = {}
-        self.named_formatters = {}
-        self.default_formatter = None
+    def __init__(self, app=None, renderers=('json', 'jinja2',), default_renderer=None):
+        self.mime_type_renderers = {}
+        self.named_renderers = {}
+        self.default_renderer = None
 
-        for formatter in formatters:
-            if isinstance(formatter, basestring):
-                formatter = getattr(_formatters, '%s_formatter' % formatter)
+        for renderer in renderers:
+            if isinstance(renderer, basestring):
+                renderer = getattr(_renderers, '%s_renderer' % renderer)
 
-            self.register_formatter(formatter)
+            self.register_renderer(renderer)
 
-        if isinstance(default_formatter, basestring):
-            default_formatter = self.named_formatters[default_formatter]
-        self.default_formatter = default_formatter
+        if isinstance(default_renderer, basestring):
+            default_renderer = self.named_renderers[default_renderer]
+        self.default_renderer = default_renderer
 
         if app:
             self.init_app(app)
@@ -42,99 +42,99 @@ class Pushrod(object):
 
         app.pushrod = self
 
-    def register_formatter(self, formatter, default=False):
+    def register_renderer(self, renderer, default=False):
         """
-        Registers a formatter with the Pushrod resolver (can also be done by passing the formatter to the constructor).
+        Registers a renderer with the Pushrod resolver (can also be done by passing the renderer to the constructor).
         """
 
-        if not formatter._is_pushrod_formatter:
-            raise TypeError(u'Got passed an invalid formatter')
+        if not renderer._is_pushrod_renderer:
+            raise TypeError(u'Got passed an invalid renderer')
 
-        for name in formatter.formatter_names:
-            self.named_formatters[name] = formatter
+        for name in renderer.renderer_names:
+            self.named_renderers[name] = renderer
 
-        for mime_type in formatter.formatter_mime_types:
-            self.mime_type_formatters[mime_type] = formatter
+        for mime_type in renderer.renderer_mime_types:
+            self.mime_type_renderers[mime_type] = renderer
 
-    def get_formatters_for_request(self, request=None):
+    def get_renderers_for_request(self, request=None):
         """
-        Inspects a Flask :class:`~flask.Request` for hints regarding what formatter to use.
+        Inspects a Flask :class:`~flask.Request` for hints regarding what renderer to use.
 
         :param request: The request to be inspected (defaults to :obj:`flask.request`)
-        :returns: List of matching formatters, in order of user preference
+        :returns: List of matching renderers, in order of user preference
         """
 
         if request is None:
             request = current_request
 
         if self.format_arg_name in request.args:
-            formatter_name = request.args[self.format_arg_name]
+            renderer_name = request.args[self.format_arg_name]
 
-            if formatter_name in self.named_formatters:
-                return [self.named_formatters[formatter_name]]
+            if renderer_name in self.named_renderers:
+                return [self.named_renderers[renderer_name]]
             else:
                 return []
 
-        matching_formatters = [self.mime_type_formatters[mime_type]
+        matching_renderers = [self.mime_type_renderers[mime_type]
                                for mime_type in request.accept_mimetypes.itervalues()
-                               if mime_type in self.mime_type_formatters]
+                               if mime_type in self.mime_type_renderers]
 
-        if self.default_formatter:
-            matching_formatters.append(self.default_formatter)
+        if self.default_renderer:
+            matching_renderers.append(self.default_renderer)
 
-        return matching_formatters
+        return matching_renderers
 
-    def format_response(self, response, formatter=None, formatter_kwargs=None):
+    def render_response(self, response, renderer=None, renderer_kwargs=None):
         """
-        Formats an unformatted response (a bare value, a (response, status, headers)-:obj:`tuple`, or an :class:`~flask.ext.pushrod.formatters.UnformattedResponse` object).
+        Renders an unrendered response (a bare value, a (response, status, headers)-:obj:`tuple`, or an :class:`~flask.ext.pushrod.renderers.UnrenderedResponse` object).
 
-        :throws FormatterNotFound: If a usable formatter could not be found (explicit formatter argument points to an invalid format, or no acceptable mime types can be used as targets and there is no default formatter)
-        :param response: The response to format
-        :param formatter: The formatter to use (defaults to using :meth:`get_formatter_for_request`)
-        :param formatter_kwargs: Any extra arguments to pass to the formatter
+        :throws RendererNotFound: If a usable renderer could not be found (explicit renderer argument points to an invalid render, or no acceptable mime types can be used as targets and there is no default renderer)
+        :param response: The response to render
+        :param renderer: The renderer to use (defaults to using :meth:`get_renderer_for_request`)
+        :param renderer_kwargs: Any extra arguments to pass to the renderer
 
         .. note::
            For convenience, a bare string (:obj:`unicode`, :obj:`str`, or any other :obj:`basestring` derivative), or a derivative of :class:`werkzeug.wrappers.BaseResponse` (such as :class:`flask.Response`) is passed through unchanged.
         .. note::
-           A formatter may mark itself as unable to format a specific response by returning :obj:`None`, in which case the next possible formatter is attempted.
+           A renderer may mark itself as unable to render a specific response by returning :obj:`None`, in which case the next possible renderer is attempted.
         """
 
-        formatters = [formatter] if formatter else self.get_formatters_for_request()
+        renderers = [renderer] if renderer else self.get_renderers_for_request()
 
-        if formatter_kwargs is None:
-            formatter_kwargs = {}
+        if renderer_kwargs is None:
+            renderer_kwargs = {}
 
         if isinstance(response, (basestring, BaseResponse)):
             return response
 
-        if not isinstance(response, UnformattedResponse):
+        if not isinstance(response, UnrenderedResponse):
             if isinstance(response, tuple):
                 response_raw, status, headers = response
-                response = UnformattedResponse(response, status, headers)
+                response = UnrenderedResponse(response, status, headers)
             else:
-                response = UnformattedResponse(response)
+                response = UnrenderedResponse(response)
 
-        for formatter in formatters:
-            formatted = formatter(response, **formatter_kwargs)
+        for renderer in renderers:
+            rendered = renderer(response, **renderer_kwargs)
 
-            if formatted is not None:
-                return formatted
+            if rendered is not None:
+                return rendered
 
-        raise FormatterNotFound()
+        raise RendererNotFound()
 
 
-def pushrod_view(**formatter_kwargs):
+def pushrod_view(**renderer_kwargs):
     """
-    Decorator that wraps view functions and formats their responses through :meth:`flask.ext.pushrod.Pushrod.format_response`.
+    Decorator that wraps view functions and renders their responses through :meth:`flask.ext.pushrod.Pushrod.render_response`.
 
-    :param formatter_kwargs: Any extra arguments to pass to the formatter
+    :param renderer_kwargs: Any extra arguments to pass to the renderer
     """
 
     def decorator(f):
         @wraps(f)
         def wrapper(*view_args, **view_kwargs):
             response = f(*view_args, **view_kwargs)
-            return current_app.pushrod.format_response(response, formatter_kwargs=formatter_kwargs)
+            return current_app.pushrod.render_response(response, renderer_kwargs=renderer_kwargs)
 
         return wrapper
 

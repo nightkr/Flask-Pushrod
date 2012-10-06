@@ -9,7 +9,7 @@ setup(
     author='Nullable',
     author_email='teo@nullable.se',
     description='An API microframework based on the idea of that the UI is just yet another endpoint',
-    packages=['flask_pushrod', 'flask_pushrod.formatters'],
+    packages=['flask_pushrod', 'flask_pushrod.renderers'],
     zip_safe=False,
     platforms='any',
     install_requires=[
