@@ -1,0 +1,15 @@
+
+{
+    "spam": "{{ spam }}",
+    "yes": [
+        {%- for i in yes %}
+        "{{ i }}",
+        {%- endfor %}
+    ],
+    "nonsense": (
+        {%- for i in nonsense %}
+        {% if i is string %}"{{ i }}"{% else %}{{ i }}{% endif %},
+        {%- endfor %}
+    ),
+}
+

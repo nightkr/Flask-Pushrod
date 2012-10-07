@@ -1,16 +1,19 @@
 from flask import Flask, Response
+import flask
 
 from nose.tools import raises
 
 from .resolver import Pushrod, pushrod_view
 from .renderers.base import renderer, UnrenderedResponse, RendererNotFound
 from .renderers.json import json_renderer
+from .renderers.jinja2 import jinja2_renderer
 
 from unittest import TestCase
 import json
 
 
-test_response = {
+test_response_str = """
+{
     "spam": "eggs",
     "yes": [
         "maybe",
@@ -23,6 +26,9 @@ test_response = {
         -5.4,
     ),
 }
+"""
+
+test_response = eval(test_response_str)
 
 
 @renderer('repr')
@@ -30,9 +36,36 @@ def repr_renderer(unrendered, **kwargs):
     return unrendered.rendered(repr(unrendered.response), "text/plain")
 
 
+def test_constructor_renderer_registration():
+    pushrod = Pushrod(renderers=['json'])
+
+    assert 'html' not in pushrod.named_renderers
+    assert 'text/html' not in pushrod.mime_type_renderers
+
+    assert 'json' in pushrod.named_renderers
+    assert 'application/json' in pushrod.mime_type_renderers
+
+    assert pushrod.named_renderers['json'] == json_renderer
+    assert pushrod.mime_type_renderers['application/json'] == json_renderer
+
+    pushrod = Pushrod(renderers=[repr_renderer])
+
+    assert 'html' not in pushrod.named_renderers
+    assert 'text/html' not in pushrod.named_renderers
+
+    assert 'json' not in pushrod.named_renderers
+    assert 'application/json' not in pushrod.mime_type_renderers
+
+    assert 'repr' in pushrod.named_renderers
+
+    assert pushrod.named_renderers['repr'] == repr_renderer
+
+
 class PushrodTestCase(TestCase):
     def setUp(self):
-        app = Flask(__name__)
+        app = Flask(__name__,
+            template_folder='test_templates',
+        )
         pushrod = Pushrod(app)
 
         pushrod.register_renderer(repr_renderer)
@@ -115,3 +148,25 @@ class PushrodRendererTestCase(PushrodTestCase):
         assert regular == rendered.data
 
         json.loads(rendered.data)
+
+    @raises(RendererNotFound)
+    def test_jinja_renderer_no_template(self):
+        self.app.pushrod.render_response(
+            test_response, jinja2_renderer)
+
+    def test_jinja_renderer_no_template_fallback(self):
+        self.app.pushrod.render_response(
+            test_response, [jinja2_renderer, json_renderer])
+
+    def test_jinja_renderer(self):
+        regular = test_response_str
+
+        with self.app.test_request_context():
+            flask.current_app
+            rendered = self.app.pushrod.render_response(
+                test_response, jinja2_renderer, {'jinja_template': 'jinja.txt'})
+
+        assert regular == rendered.data, \
+            "'%s' does not equal '%s'" % (rendered.data, regular)
+
+        assert eval(rendered.data) == test_response

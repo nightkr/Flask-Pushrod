@@ -37,12 +37,12 @@ def renderer(name=None, mime_type=None):
     :param mime_type: A :obj:`basestring` or a tuple of basestrings to match against against when using HTTP content negotiation
     """
 
-    if not name:
+    if not name:  # pragma: no cover
         name = ()
     if isinstance(name, basestring):
         name = (name,)
 
-    if not mime_type:
+    if not mime_type:  # pragma: no cover
         mime_type = ()
     if isinstance(mime_type, basestring):
         mime_type = (mime_type,)
