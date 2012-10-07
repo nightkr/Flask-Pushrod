@@ -90,7 +90,7 @@ class Pushrod(object):
 
         :throws RendererNotFound: If a usable renderer could not be found (explicit renderer argument points to an invalid render, or no acceptable mime types can be used as targets and there is no default renderer)
         :param response: The response to render
-        :param renderer: The renderer to use (defaults to using :meth:`get_renderer_for_request`)
+        :param renderer: The renderer(s) to use (defaults to using :meth:`get_renderer_for_request`)
         :param renderer_kwargs: Any extra arguments to pass to the renderer
 
         .. note::
@@ -99,7 +99,13 @@ class Pushrod(object):
            A renderer may mark itself as unable to render a specific response by returning :obj:`None`, in which case the next possible renderer is attempted.
         """
 
-        renderers = [renderer] if renderer else self.get_renderers_for_request()
+        if renderer:
+            if hasattr(renderer, "__iter__"):
+                renderers = renderer
+            else:
+                renderers = [renderer]
+        else:
+            renderers = self.get_renderers_for_request()
 
         if renderer_kwargs is None:
             renderer_kwargs = {}
