@@ -6,6 +6,8 @@ from .renderers import RendererNotFound, UnrenderedResponse
 
 from functools import wraps
 
+import logging
+
 
 class Pushrod(object):
     """
@@ -15,12 +17,38 @@ class Pushrod(object):
     """
 
     #: The query string argument checked for an explicit renderer (to override header-based content type negotiation).
+    #:
+    #: .. note::
+    #:    This is set on the class level, not the instance level.
     format_arg_name = "format"
 
-    def __init__(self, app=None, renderers=('json', 'jinja2',), default_renderer=None):
+    @property
+    def logger(self):
+        """
+        Gets the logger to use, mainly for internal use.
+
+        The current resolution order looks as follows:
+
+        - :attr:`self.app <app>`
+        - :data:`flask.current_app`
+        - :mod:`logging`
+        """
+
+        if self.app:
+            return self.app.logger
+        elif current_app:
+            return current_app.logger
+        else:
+            return logging
+
+    def __init__(self, app=None, renderers=('json', 'jinja2',), default_renderer='html'):
+        #: The renderers keyed by MIME type.
         self.mime_type_renderers = {}
+        #: The renderers keyed by output format name (such as html).
         self.named_renderers = {}
-        self.default_renderer = None
+
+        #: The current app, only set from the constructor, not if using :meth:`init_app`.
+        self.app = app or None
 
         for renderer in renderers:
             if isinstance(renderer, basestring):
@@ -29,7 +57,11 @@ class Pushrod(object):
             self.register_renderer(renderer)
 
         if isinstance(default_renderer, basestring):
-            default_renderer = self.named_renderers[default_renderer]
+            if default_renderer in self.named_renderers:
+                default_renderer = self.named_renderers[default_renderer]
+            else:
+                self.logger.warning(u"Attempted to set the unrenderable format '%s' as the default format, disabling", default_renderer)
+                default_renderer = None
         self.default_renderer = default_renderer
 
         if app:
