@@ -147,7 +147,7 @@ class Pushrod(object):
 
         if not isinstance(response, UnrenderedResponse):
             if isinstance(response, tuple):
-                response_raw, status, headers = response
+                response, status, headers = response
                 response = UnrenderedResponse(response, status, headers)
             else:
                 response = UnrenderedResponse(response)
