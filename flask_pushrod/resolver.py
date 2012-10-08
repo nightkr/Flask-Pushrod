@@ -79,7 +79,7 @@ class Pushrod(object):
         Registers a renderer with the Pushrod resolver (can also be done by passing the renderer to the constructor).
         """
 
-        if not renderer._is_pushrod_renderer:
+        if not (hasattr(renderer, '_is_pushrod_renderer') and renderer._is_pushrod_renderer):
             raise TypeError(u'Got passed an invalid renderer')
 
         for name in renderer.renderer_names:
