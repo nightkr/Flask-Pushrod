@@ -5,3 +5,5 @@ build
 dist
 .docstates.suo
 docs/_build
+htmlcov
+.coverage

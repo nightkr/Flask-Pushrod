@@ -1,5 +1,7 @@
-from flask import Flask, Response
+from flask import Flask, Response, Request
 import flask
+
+from werkzeug.test import EnvironBuilder
 
 from nose.tools import raises
 
@@ -34,31 +36,6 @@ test_response = eval(test_response_str)
 @renderer('repr')
 def repr_renderer(unrendered, **kwargs):
     return unrendered.rendered(repr(unrendered.response), "text/plain")
-
-
-def test_constructor_renderer_registration():
-    pushrod = Pushrod(renderers=['json'])
-
-    assert 'html' not in pushrod.named_renderers
-    assert 'text/html' not in pushrod.mime_type_renderers
-
-    assert 'json' in pushrod.named_renderers
-    assert 'application/json' in pushrod.mime_type_renderers
-
-    assert pushrod.named_renderers['json'] == json_renderer
-    assert pushrod.mime_type_renderers['application/json'] == json_renderer
-
-    pushrod = Pushrod(renderers=[repr_renderer])
-
-    assert 'html' not in pushrod.named_renderers
-    assert 'text/html' not in pushrod.named_renderers
-
-    assert 'json' not in pushrod.named_renderers
-    assert 'application/json' not in pushrod.mime_type_renderers
-
-    assert 'repr' in pushrod.named_renderers
-
-    assert pushrod.named_renderers['repr'] == repr_renderer
 
 
 class PushrodTestCase(TestCase):
@@ -137,6 +114,76 @@ class PushrodResolverTestCase(PushrodTestCase):
 
         with self.app.test_request_context("/?format=none"):
             self.app.pushrod.render_response(test_renderer_not_found_view(), "none")
+
+    def test_constructor_renderer_registration(self):
+        get_request_obj = lambda *args, **kwargs: Request(EnvironBuilder(*args, **kwargs).get_environ())
+
+        pushrod = Pushrod(renderers=['json'])
+
+        assert pushrod.default_renderer == None
+
+        assert 'html' not in pushrod.named_renderers
+        assert 'text/html' not in pushrod.mime_type_renderers
+
+        assert 'json' in pushrod.named_renderers
+        assert 'application/json' in pushrod.mime_type_renderers
+
+        assert pushrod.named_renderers['json'] == json_renderer
+        assert pushrod.mime_type_renderers['application/json'] == json_renderer
+
+        assert pushrod.get_renderers_for_request(get_request_obj("/")) == []
+        assert pushrod.get_renderers_for_request(get_request_obj("/?format=json")) == [json_renderer]
+
+        pushrod = Pushrod(renderers=[repr_renderer])
+
+        assert 'html' not in pushrod.named_renderers
+        assert 'text/html' not in pushrod.named_renderers
+
+        assert 'json' not in pushrod.named_renderers
+        assert 'application/json' not in pushrod.mime_type_renderers
+
+        assert 'repr' in pushrod.named_renderers
+
+        assert pushrod.named_renderers['repr'] == repr_renderer
+
+        assert pushrod.get_renderers_for_request(get_request_obj("/")) == []
+        assert pushrod.get_renderers_for_request(get_request_obj("/?format=repr")) == [repr_renderer]
+
+        pushrod = Pushrod(renderers=[repr_renderer], default_renderer='repr')
+
+        assert pushrod.get_renderers_for_request(get_request_obj("/")) == [repr_renderer]
+
+        with self.app.app_context():
+            Pushrod(renderers=[])
+
+        Pushrod(self.app, renderers=[])
+
+        Pushrod(self.app, default_renderer=repr_renderer)
+
+    @raises(TypeError)
+    def test_register_invalid_renderer(self):
+        def dummy():  # pragma: no cover
+            pass
+
+        self.app.pushrod.register_renderer(dummy)
+
+    def test_render_tuple_response(self):
+        response = self.app.pushrod.render_response((
+            {u'aaa': u"hi"},  # Response value
+            978,            # Status code
+            {               # Headers
+                'X-Aaa': "Hi!",
+            },
+        ), json_renderer)
+
+        assert response.status_code == 978
+        assert 'X-Aaa' in response.headers
+        assert response.headers['X-Aaa'] == "Hi!"
+
+        response_json = json.loads(response.data)
+
+        assert u'aaa' in response_json
+        assert response_json[u'aaa'] == u"hi"
 
 
 class PushrodRendererTestCase(PushrodTestCase):
