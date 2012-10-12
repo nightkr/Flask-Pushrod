@@ -1,4 +1,17 @@
 from setuptools import setup
+from setuptools.command.test import test as TestCommand
+
+
+class PyTest(TestCommand):
+    def finalize_options(self):
+        TestCommand.finalize_options(self)
+        self.test_args = []
+        self.test_suite = True
+
+    def run_tests(self):
+        #import here, cause outside the eggs aren't loaded
+        import pytest
+        pytest.main(self.test_args)
 
 
 setup(
@@ -17,8 +30,9 @@ setup(
         'Flask>=0.9',
     ],
     tests_require=[
-        'nose==1.2.1',
+        'pytest>=2.2.4',
     ],
+    cmdclass={'test': PyTest},
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Environment :: Web Environment',
@@ -29,5 +43,4 @@ setup(
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
-    test_suite='nose.collector',
 )

@@ -51,6 +51,10 @@ class PushrodTestCase(TestCase):
         self.app = app
         self.client = app.test_client()
 
+    def setup_method(self, method):
+        # Setup for py.test
+        return self.setUp()
+
 
 class PushrodResolverTestCase(PushrodTestCase):
     def test_raw_dict_response_data(self):
