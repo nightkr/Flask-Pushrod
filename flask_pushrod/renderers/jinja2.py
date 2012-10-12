@@ -6,7 +6,7 @@ from .base import renderer
 import flask
 
 
-@renderer('html', 'text/html')
+@renderer('html', 'text/html', normalize=False)
 def jinja2_renderer(unrendered, jinja_template=None, **kwargs):
     """
     Renders a response using :func:`flask.render_template`.
