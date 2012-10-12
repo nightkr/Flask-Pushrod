@@ -205,15 +205,12 @@ class PushrodNormalizerTestCase(PushrodTestCase):
 
     def test_iterable_normalizer(self):
         in_list = ["test string", 57]
-        in_tuple = tuple(in_list)
-
-        assert in_list == in_tuple
 
         from_list = self.app.pushrod.normalize(in_list)
-        from_tuple = self.app.pushrod.normalize(in_tuple)
+        from_tuple = self.app.pushrod.normalize(tuple(in_list))
 
         assert from_list == in_list
-        assert from_tuple == in_tuple
+        assert from_tuple == in_list
 
     def test_dict_normalizer(self):
         in_dict = {

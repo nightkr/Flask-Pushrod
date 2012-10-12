@@ -56,6 +56,11 @@ class Pushrod(object):
         self.normalizer_fallbacks = {
             basestring: normalizers.normalize_basestring,
             list: normalizers.normalize_iterable,
+            tuple: normalizers.normalize_iterable,
+            dict: normalizers.normalize_dict,
+            int: normalizers.normalize_int,
+            long: normalizers.normalize_int,
+            float: normalizers.normalize_float,
         }
 
         #: The current app, only set from the constructor, not if using :meth:`init_app`.
