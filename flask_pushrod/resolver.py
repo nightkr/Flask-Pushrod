@@ -1,10 +1,11 @@
 from flask import current_app, request as current_request
 from werkzeug.wrappers import BaseResponse
 
-from . import renderers as _renderers
+from . import renderers as _renderers, normalizers
 from .renderers import RendererNotFound, UnrenderedResponse
 
 from functools import wraps
+from collections import defaultdict
 
 import logging
 
@@ -46,6 +47,16 @@ class Pushrod(object):
         self.mime_type_renderers = {}
         #: The renderers keyed by output format name (such as html).
         self.named_renderers = {}
+
+        #: Hooks for overriding a class' normalizer, even if they explicitly define one.
+        #:
+        #: All items should be lists of callables. All values default to an empty list.
+        self.normalizer_overrides = defaultdict(lambda: [])
+        #: Hooks for providing a class with a fallback normalizer, which is called only if it doesn't define one. All items should be callables.
+        self.normalizer_fallbacks = {
+            basestring: normalizers.normalize_basestring,
+            list: normalizers.normalize_iterable,
+        }
 
         #: The current app, only set from the constructor, not if using :meth:`init_app`.
         self.app = app or None
@@ -159,6 +170,64 @@ class Pushrod(object):
                 return rendered
 
         raise RendererNotFound()
+
+    def normalize(self, obj):
+        """
+        Runs an object through the normalizer mechanism, with the goal of producing a value consisting only of "native types" (:obj:`unicode`, :obj:`int`, :obj:`long`, :obj:`float`, :obj:`dict`, :obj:`list`, etc).
+
+        The resolution order looks like this:
+
+        - Loop through :attr:`self.normalizer_overrides[type(obj)] <normalizer_overrides>` (taking parent classes into account), should be a callable taking (obj, pushrod), falls through on :obj:`NotImplemented`
+        - obj.__pushrod_normalize__, should be a callable taking the :class:`Pushrod` instance as an argument argument
+        - obj.__pushrod_fields__, a :obj:`dict` is built where the key name is the field name and the value is ran normalized
+        - obj.__pushrod_field__, a value which is normalized instead of obj
+        - :attr:`self.normalizer_fallbacks[type(obj)] <normalizer_fallbacks` (taking parent classes into account), should be a callable taking (obj, pushrod), falls through on :obj:`NotImplemented`
+
+        These are the default fallbacks:
+
+        +-----------------+-----------------------------------------------------------+
+        |Type             |Behaviour                                                  |
+        +=================+===========================================================+
+        |:obj:`basestring`|Converted to :obj:`unicode`                                |
+        +-----------------+-----------------------------------------------------------+
+        |:obj:`list`      |Values are normalized                                      |
+        +-----------------+-----------------------------------------------------------+
+        |:obj:`tuple`     |Converted to :obj:`list`, then normalized again            |
+        +-----------------+-----------------------------------------------------------+
+        |:obj:`dict`      |Keys are converted to :obj:`unicode`, values are normalized|
+        +-----------------+-----------------------------------------------------------+
+        |:obj:`int`       |Passed through                                             |
+        +-----------------+-----------------------------------------------------------+
+        |:obj:`long`      |Passed through                                             |
+        +-----------------+-----------------------------------------------------------+
+        |:obj:`float`     |Passed through                                             |
+        +-----------------+-----------------------------------------------------------+
+
+        :param obj: The object to normalize.
+        """
+
+        for cls in type(obj).__mro__:
+            for override in self.normalizer_overrides[cls]:
+                attempt = self.normalizer_overrides[cls](obj, self)
+                if attempt is not NotImplemented:
+                    return attempt
+
+        if hasattr(obj, '__pushrod_normalize__'):
+            return obj.__pushrod_normalize__(self)
+
+        if hasattr(obj, '__pushrod_fields__'):
+            return self.normalize(dict((name, self.normalize(getattr(obj, name))) for name in obj.__pushrod_fields__))
+
+        if hasattr(obj, '__pushrod_field__'):
+            return self.normalize(getattr(obj, obj.__pushrod_field__))
+
+        for cls in type(obj).__mro__:
+            if cls in self.normalizer_fallbacks:
+                attempt = self.normalizer_fallbacks[cls](obj, self)
+                if attempt is not NotImplemented:
+                    return attempt
+
+        return NotImplemented
 
 
 def pushrod_view(**renderer_kwargs):

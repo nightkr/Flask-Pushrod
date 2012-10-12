@@ -186,6 +186,52 @@ class PushrodResolverTestCase(PushrodTestCase):
         assert response_json[u'aaa'] == u"hi"
 
 
+class PushrodNormalizerTestCase(PushrodTestCase):
+    def test_basestring_normalizer(self):
+        from_unicode = self.app.pushrod.normalize(u"testing string")
+        from_str = self.app.pushrod.normalize("testing string")
+
+        assert from_unicode == u"testing string"
+        assert from_str == u"testing string"
+
+    def test_number_normalizer(self):
+        assert self.app.pushrod.normalize(10) == 10
+        assert self.app.pushrod.normalize(500L) == 500L
+        assert self.app.pushrod.normalize(20.5) == 20.5
+
+    def test_iterable_normalizer(self):
+        in_list = ["test string", 57]
+        in_tuple = tuple(in_list)
+
+        assert in_list == in_tuple
+
+        from_list = self.app.pushrod.normalize(in_list)
+        from_tuple = self.app.pushrod.normalize(in_tuple)
+
+        assert from_list == in_list
+        assert from_tuple == in_tuple
+
+    def test_dict_normalizer(self):
+        in_dict = {
+            "hi": 54,
+            "bleh": "testable",
+            "no": ["12"],
+        }
+
+        assert self.app.pushrod.normalize(in_dict) == in_dict
+
+    def test_delegate_normalizer(self):
+        class MyClass(object):
+            __pushrod_field__ = "value"
+
+            def __init__(self):
+                self.value = 53.21
+
+        my_instance = MyClass()
+
+        assert self.app.pushrod.normalize(my_instance) == self.app.pushrod.normalize(my_instance.value)
+
+
 class PushrodRendererTestCase(PushrodTestCase):
     def test_json_renderer(self):
         regular = json.dumps(test_response)
