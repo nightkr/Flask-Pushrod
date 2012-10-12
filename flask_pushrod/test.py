@@ -252,6 +252,40 @@ class PushrodNormalizerTestCase(PushrodTestCase):
 
         assert self.app.pushrod.normalize(my_instance) == self.app.pushrod.normalize(my_instance.value)
 
+    def test_no_normalizer(self):
+        class MyClass(object):
+            pass
+
+        assert self.app.pushrod.normalize(MyClass()) == NotImplemented
+
+        self.app.pushrod.normalizer_fallbacks[MyClass] = lambda x, pushrod: NotImplemented
+
+        assert self.app.pushrod.normalize(MyClass()) == NotImplemented
+
+    def test_normalizer_method(self):
+        class MyClass(object):
+            def __pushrod_normalize__(self, pushrod):
+                return u"Normalized!"
+
+        assert self.app.pushrod.normalize(MyClass()) == u"Normalized!"
+
+    def test_normalizer_generated_dict(self):
+        class MyClass(object):
+            __pushrod_fields__ = ["one", "three"]
+
+            def __init__(self, one, two, three):
+                self.one = one
+                self.two = two
+                self.three = three
+
+        assert self.app.pushrod.normalize(MyClass('first', 'second', 'third')) == {u'one': u'first', u'three': u'third'}
+
+    def test_normalizer_override(self):
+        self.app.pushrod.normalizer_overrides[int].append(lambda x, pushrod: unicode(x) if x > 0 else NotImplemented)
+
+        assert self.app.pushrod.normalize(0) == 0
+        assert self.app.pushrod.normalize(1) == u"1"
+
 
 class PushrodRendererTestCase(PushrodTestCase):
     def test_json_renderer(self):
