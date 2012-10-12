@@ -51,9 +51,22 @@ class PushrodTestCase(TestCase):
         self.app = app
         self.client = app.test_client()
 
+        if not hasattr(self, 'app_contexts'):
+            self.app_contexts = []
+        app_context = app.app_context()
+        app_context.push()
+        self.app_contexts.append(app_context)
+
+    def tearDown(self):
+        self.app_contexts.pop().pop()
+
     def setup_method(self, method):
         # Setup for py.test
         return self.setUp()
+
+    def teardown_method(self, method):
+        # Setup for py.test
+        return self.tearDown()
 
 
 class PushrodResolverTestCase(PushrodTestCase):
