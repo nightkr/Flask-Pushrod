@@ -13,6 +13,8 @@ from .renderers.jinja2 import jinja2_renderer
 from unittest import TestCase
 import json
 
+import logging
+
 
 test_response_str = """
 {
@@ -36,6 +38,11 @@ test_response = eval(test_response_str)
 @renderer('repr')
 def repr_renderer(unrendered, **kwargs):
     return unrendered.rendered(repr(unrendered.response), "text/plain")
+
+
+def test_logging_no_app():
+    pushrod = Pushrod()
+    assert pushrod.logger == logging
 
 
 class PushrodTestCase(TestCase):
