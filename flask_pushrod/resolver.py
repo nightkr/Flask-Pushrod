@@ -93,8 +93,6 @@ class Pushrod(object):
         Registers the Pushrod resolver with the Flask app (can also be done by passing the app to the constructor).
         """
 
-        if not hasattr(app, 'extensions'):
-            app.extensions = {}
         app.extensions['pushrod'] = self
 
         def get_pushrod_extension(self):
