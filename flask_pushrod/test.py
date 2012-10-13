@@ -278,6 +278,12 @@ class PushrodNormalizerTestCase(PushrodTestCase):
 
         assert self.pushrod.normalize(MyClass()) == NotImplemented
 
+    def test_dict_value_no_normalizer(self):
+        class MyClass(object):
+            pass
+
+        assert self.pushrod.normalize({u"one": u"two", u"three": MyClass(), u"five": 6}) == {u"one": u"two", u"five": 6}
+
     def test_normalizer_method(self):
         class MyClass(object):
             def __pushrod_normalize__(self, pushrod):

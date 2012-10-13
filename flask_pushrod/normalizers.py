@@ -7,7 +7,8 @@ def normalize_iterable(x, pushrod):
 
 
 def normalize_dict(x, pushrod):
-    return dict((pushrod.normalize(unicode(k)), pushrod.normalize(v)) for k, v in x.items())
+    normalized = dict((pushrod.normalize(unicode(k)), pushrod.normalize(v)) for k, v in x.items())
+    return dict((k, v) for k, v in normalized.items() if v is not NotImplemented)
 
 
 def normalize_int(x, pushrod):
