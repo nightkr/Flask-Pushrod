@@ -1,4 +1,4 @@
-from flask import current_app, request as current_request
+from flask import Flask, current_app, request as current_request
 from werkzeug.wrappers import BaseResponse
 
 from . import renderers as _renderers, normalizers
@@ -8,6 +8,7 @@ from functools import wraps
 from collections import defaultdict
 
 import logging
+import warnings
 
 from types import NoneType
 
@@ -92,7 +93,19 @@ class Pushrod(object):
         Registers the Pushrod resolver with the Flask app (can also be done by passing the app to the constructor).
         """
 
-        app.pushrod = self
+        if not hasattr(app, 'extensions'):
+            app.extensions = {}
+        app.extensions['pushrod'] = self
+
+        def get_pushrod_extension(self):
+            msg = "Accessing the Pushrod object by using app.pushrod is deprecated, use app.extensions['pushrod']"
+
+            if self.testing:
+                raise DeprecationWarning(msg)
+            else:
+                warnings.warn(msg, DeprecationWarning, stacklevel=2)
+            return self.extensions['pushrod']
+        Flask.pushrod = property(get_pushrod_extension)
 
     def register_renderer(self, renderer, default=False):
         """
