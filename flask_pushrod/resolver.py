@@ -9,6 +9,8 @@ from collections import defaultdict
 
 import logging
 
+from types import NoneType
+
 
 class Pushrod(object):
     """
@@ -61,6 +63,8 @@ class Pushrod(object):
             int: normalizers.normalize_int,
             long: normalizers.normalize_int,
             float: normalizers.normalize_float,
+            bool: normalizers.normalize_bool,
+            NoneType: normalizers.normalize_none,
         }
 
         #: The current app, only set from the constructor, not if using :meth:`init_app`.
@@ -206,6 +210,8 @@ class Pushrod(object):
         |:obj:`long`      |Passed through                                             |
         +-----------------+-----------------------------------------------------------+
         |:obj:`float`     |Passed through                                             |
+        +-----------------+-----------------------------------------------------------+
+        |:obj:`bool`      |Passed through                                             |
         +-----------------+-----------------------------------------------------------+
 
         :param obj: The object to normalize.

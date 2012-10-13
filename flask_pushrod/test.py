@@ -223,6 +223,12 @@ class PushrodNormalizerTestCase(PushrodTestCase):
         assert self.app.pushrod.normalize(500L) == 500L
         assert self.app.pushrod.normalize(20.5) == 20.5
 
+    def test_bool_normalizer(self):
+        assert self.app.pushrod.normalize(True) == True
+
+    def test_none_normalizer(self):
+        assert self.app.pushrod.normalize(None) == None
+
     def test_iterable_normalizer(self):
         in_list = ["test string", 57]
 

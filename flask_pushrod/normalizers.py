@@ -16,3 +16,11 @@ def normalize_int(x, pushrod):
 
 def normalize_float(x, pushrod):
     return float(x)
+
+
+def normalize_bool(x, pushrod):
+    return bool(x)
+
+
+def normalize_none(x, pushrod):
+    return None
