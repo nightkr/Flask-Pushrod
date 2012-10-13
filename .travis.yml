@@ -5,7 +5,6 @@ python:
   - "pypy"
 env:
   - FLASK_VERSION=0.9
-  - FLASK_VERSION=0.8.1
 install:
   - "pip install -r requirements.txt --use-mirrors"
   - "pip install flask==$FLASK_VERSION --use-mirrors"
