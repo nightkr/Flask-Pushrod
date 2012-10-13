@@ -112,7 +112,7 @@ Sometimes the available Pushrod renderers might not meet your requirements. Fort
    Always take a ``**kwargs`` in your renderer, since other renderers might take arguments that don't matter to your renderer.
 
 .. warning::
-   Of course, you should never use :func:`~repr.repr` in production code, it is just an example to demostrate the syntax without having to go through the regular boilerplate code of creating the response ourselves..
+   Of course, you should never use :func:`~repr.repr` like this in production code, it is just an example to demostrate the syntax without having to go through the regular boilerplate code of creating the response ourselves.
 
 And you would register it to your :class:`~flask.ext.pushrod.Pushrod` instance using :meth:`~flask.ext.pushrod.Pushrod.register_renderer`.
 
