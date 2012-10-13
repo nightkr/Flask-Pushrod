@@ -27,7 +27,7 @@ setup(
     platforms='any',
     install_requires=[
         'Werkzeug>=0.7',
-        'Flask>=0.9',
+        'Flask>=0.8.1',
     ],
     tests_require=[
         'pytest>=2.2.4',
