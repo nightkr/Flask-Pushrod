@@ -67,8 +67,7 @@ class PushrodTestCase(TestCase):
         self.app_contexts.append(app_context)
 
     def tearDown(self):
-        if hasattr(self, 'app_contexts'):
-            self.app_contexts.pop().pop()
+        self.app_contexts.pop().pop()
 
     def setup_method(self, method):
         # Setup for py.test
