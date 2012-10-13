@@ -1,5 +1,7 @@
-Flask-Pushrod [![Build Status](https://secure.travis-ci.org/dontcare4free/Flask-Pushrod.png)](http://travis-ci.org/dontcare4free/Flask-Pushrod)
+Flask-Pushrod
 =============
+
+[![Build Status](https://secure.travis-ci.org/dontcare4free/Flask-Pushrod.png)](http://travis-ci.org/dontcare4free/Flask-Pushrod)
 
 Flask-Pushrod is a simple helper for Flask for doing content negotiation (primarily for running the API and the website on the same code-base, with as little separate handling as possible).
 
@@ -36,6 +38,13 @@ if __name__ == "__main__":
 ```
 
 This would, depending on the request, return either the greeting message in JSON or render it through the Jinja2 `hello.html` template.
+
+Tests
+-----
+
+```bash
+$ python setup.py test
+```
 
 Documentation
 -------------
