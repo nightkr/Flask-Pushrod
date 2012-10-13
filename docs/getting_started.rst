@@ -114,7 +114,7 @@ Sometimes the available Pushrod renderers might not meet your requirements. Fort
 .. warning::
    Of course, you should never use :func:`~repr.repr` in production code, it is just an example to demostrate the syntax without having to go through the regular boilerplate code of creating the response ourselves..
 
-And you would registere it to your :class:`~flask.ext.pushrod.Pushrod` instance using :meth:`~flask.ext.pushrod.Pushrod.register_renderer`.
+And you would register it to your :class:`~flask.ext.pushrod.Pushrod` instance using :meth:`~flask.ext.pushrod.Pushrod.register_renderer`.
 
 .. note::
    Functions not decorated using :func:`~flask.ext.pushrod.renderers.renderer` may not be registered as renderers.
