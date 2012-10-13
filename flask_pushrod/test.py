@@ -50,6 +50,7 @@ class PushrodTestCase(TestCase):
         app = Flask(__name__,
             template_folder='test_templates',
         )
+        app.testing = True
         pushrod = Pushrod(app)
 
         pushrod.register_renderer(repr_renderer)
@@ -58,14 +59,15 @@ class PushrodTestCase(TestCase):
         self.app = app
         self.client = app.test_client()
 
-        if not hasattr(self, 'app_contexts'):
-            self.app_contexts = []
         app_context = app.app_context()
         app_context.push()
+        if not hasattr(self, 'app_contexts'):
+            self.app_contexts = []
         self.app_contexts.append(app_context)
 
     def tearDown(self):
-        self.app_contexts.pop().pop()
+        if hasattr(self, 'app_contexts'):
+            self.app_contexts.pop().pop()
 
     def setup_method(self, method):
         # Setup for py.test
