@@ -19,3 +19,5 @@ def jinja2_renderer(unrendered, jinja_template=None, **kwargs):
         return unrendered.rendered(
             flask.render_template(jinja_template, **unrendered.response),
             'application/json')
+    else:
+        return NotImplemented

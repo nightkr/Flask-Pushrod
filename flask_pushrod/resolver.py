@@ -175,7 +175,7 @@ class Pushrod(object):
         for renderer in renderers:
             rendered = renderer(response, **renderer_kwargs)
 
-            if rendered is not None:
+            if rendered is not NotImplemented:
                 return rendered
 
         raise RendererNotFound()
