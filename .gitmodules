@@ -1,3 +1,3 @@
-[submodule "docs/_themes"]
-	path = docs/_themes
+[submodule "docs/_flask_themes"]
+	path = docs/_flask_themes
 	url = https://github.com/mitsuhiko/flask-sphinx-themes.git
