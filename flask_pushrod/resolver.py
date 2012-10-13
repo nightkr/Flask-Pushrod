@@ -213,7 +213,7 @@ class Pushrod(object):
 
         for cls in type(obj).__mro__:
             for override in self.normalizer_overrides[cls]:
-                attempt = self.normalizer_overrides[cls](obj, self)
+                attempt = override(obj, self)
                 if attempt is not NotImplemented:
                     return attempt
 
