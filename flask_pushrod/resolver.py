@@ -267,7 +267,7 @@ def pushrod_view(**renderer_kwargs):
         @wraps(f)
         def wrapper(*view_args, **view_kwargs):
             response = f(*view_args, **view_kwargs)
-            return current_app.pushrod.render_response(response, renderer_kwargs=renderer_kwargs)
+            return current_app.extensions['pushrod'].render_response(response, renderer_kwargs=renderer_kwargs)
 
         return wrapper
 

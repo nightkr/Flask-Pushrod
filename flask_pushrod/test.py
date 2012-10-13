@@ -57,6 +57,7 @@ class PushrodTestCase(TestCase):
         pushrod.default_renderer = repr_renderer
 
         self.app = app
+        self.pushrod = app.extensions['pushrod']
         self.client = app.test_client()
 
         app_context = app.app_context()
@@ -139,7 +140,7 @@ class PushrodResolverTestCase(PushrodTestCase):
             "Status code returned from an unexistant renderer should be 406 (not acceptable)"
 
         with self.app.test_request_context("/?format=none"):
-            self.app.pushrod.render_response(test_renderer_not_found_view(), "none")
+            self.pushrod.render_response(test_renderer_not_found_view(), "none")
 
     def test_constructor_renderer_registration(self):
         get_request_obj = lambda *args, **kwargs: Request(EnvironBuilder(*args, **kwargs).get_environ())
@@ -191,10 +192,10 @@ class PushrodResolverTestCase(PushrodTestCase):
         def dummy():  # pragma: no cover
             pass
 
-        self.app.pushrod.register_renderer(dummy)
+        self.pushrod.register_renderer(dummy)
 
     def test_render_tuple_response(self):
-        response = self.app.pushrod.render_response((
+        response = self.pushrod.render_response((
             {u'aaa': u"hi"},  # Response value
             978,            # Status code
             {               # Headers
@@ -214,28 +215,28 @@ class PushrodResolverTestCase(PushrodTestCase):
 
 class PushrodNormalizerTestCase(PushrodTestCase):
     def test_basestring_normalizer(self):
-        from_unicode = self.app.pushrod.normalize(u"testing string")
-        from_str = self.app.pushrod.normalize("testing string")
+        from_unicode = self.pushrod.normalize(u"testing string")
+        from_str = self.pushrod.normalize("testing string")
 
         assert from_unicode == u"testing string"
         assert from_str == u"testing string"
 
     def test_number_normalizer(self):
-        assert self.app.pushrod.normalize(10) == 10
-        assert self.app.pushrod.normalize(500L) == 500L
-        assert self.app.pushrod.normalize(20.5) == 20.5
+        assert self.pushrod.normalize(10) == 10
+        assert self.pushrod.normalize(500L) == 500L
+        assert self.pushrod.normalize(20.5) == 20.5
 
     def test_bool_normalizer(self):
-        assert self.app.pushrod.normalize(True) == True
+        assert self.pushrod.normalize(True) == True
 
     def test_none_normalizer(self):
-        assert self.app.pushrod.normalize(None) == None
+        assert self.pushrod.normalize(None) == None
 
     def test_iterable_normalizer(self):
         in_list = ["test string", 57]
 
-        from_list = self.app.pushrod.normalize(in_list)
-        from_tuple = self.app.pushrod.normalize(tuple(in_list))
+        from_list = self.pushrod.normalize(in_list)
+        from_tuple = self.pushrod.normalize(tuple(in_list))
 
         assert from_list == in_list
         assert from_tuple == in_list
@@ -247,7 +248,7 @@ class PushrodNormalizerTestCase(PushrodTestCase):
             "no": ["12"],
         }
 
-        assert self.app.pushrod.normalize(in_dict) == in_dict
+        assert self.pushrod.normalize(in_dict) == in_dict
 
     def test_delegate_normalizer(self):
         class MyClass(object):
@@ -258,24 +259,24 @@ class PushrodNormalizerTestCase(PushrodTestCase):
 
         my_instance = MyClass()
 
-        assert self.app.pushrod.normalize(my_instance) == self.app.pushrod.normalize(my_instance.value)
+        assert self.pushrod.normalize(my_instance) == self.pushrod.normalize(my_instance.value)
 
     def test_no_normalizer(self):
         class MyClass(object):
             pass
 
-        assert self.app.pushrod.normalize(MyClass()) == NotImplemented
+        assert self.pushrod.normalize(MyClass()) == NotImplemented
 
-        self.app.pushrod.normalizer_fallbacks[MyClass] = lambda x, pushrod: NotImplemented
+        self.pushrod.normalizer_fallbacks[MyClass] = lambda x, pushrod: NotImplemented
 
-        assert self.app.pushrod.normalize(MyClass()) == NotImplemented
+        assert self.pushrod.normalize(MyClass()) == NotImplemented
 
     def test_normalizer_method(self):
         class MyClass(object):
             def __pushrod_normalize__(self, pushrod):
                 return u"Normalized!"
 
-        assert self.app.pushrod.normalize(MyClass()) == u"Normalized!"
+        assert self.pushrod.normalize(MyClass()) == u"Normalized!"
 
     def test_normalizer_generated_dict(self):
         class MyClass(object):
@@ -286,19 +287,19 @@ class PushrodNormalizerTestCase(PushrodTestCase):
                 self.two = two
                 self.three = three
 
-        assert self.app.pushrod.normalize(MyClass('first', 'second', 'third')) == {u'one': u'first', u'three': u'third'}
+        assert self.pushrod.normalize(MyClass('first', 'second', 'third')) == {u'one': u'first', u'three': u'third'}
 
     def test_normalizer_override(self):
-        self.app.pushrod.normalizer_overrides[int].append(lambda x, pushrod: unicode(x) if x > 0 else NotImplemented)
+        self.pushrod.normalizer_overrides[int].append(lambda x, pushrod: unicode(x) if x > 0 else NotImplemented)
 
-        assert self.app.pushrod.normalize(0) == 0
-        assert self.app.pushrod.normalize(1) == u"1"
+        assert self.pushrod.normalize(0) == 0
+        assert self.pushrod.normalize(1) == u"1"
 
 
 class PushrodRendererTestCase(PushrodTestCase):
     def test_json_renderer(self):
         regular = json.dumps(test_response)
-        rendered = self.app.pushrod.render_response(
+        rendered = self.pushrod.render_response(
             test_response, json_renderer)
 
         assert regular == rendered.data
@@ -307,11 +308,11 @@ class PushrodRendererTestCase(PushrodTestCase):
 
     @raises(RendererNotFound)
     def test_jinja_renderer_no_template(self):
-        self.app.pushrod.render_response(
+        self.pushrod.render_response(
             test_response, jinja2_renderer)
 
     def test_jinja_renderer_no_template_fallback(self):
-        self.app.pushrod.render_response(
+        self.pushrod.render_response(
             test_response, [jinja2_renderer, json_renderer])
 
     def test_jinja_renderer(self):
@@ -319,7 +320,7 @@ class PushrodRendererTestCase(PushrodTestCase):
 
         with self.app.test_request_context():
             flask.current_app
-            rendered = self.app.pushrod.render_response(
+            rendered = self.pushrod.render_response(
                 test_response, jinja2_renderer, {'jinja_template': 'jinja.txt'})
 
         assert regular == rendered.data, \

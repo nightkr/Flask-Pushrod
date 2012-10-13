@@ -58,7 +58,7 @@ def renderer(name=None, mime_type=None, normalize=True):
         @wraps(f)
         def wrapper(unrendered, **kwargs):
             if normalize:
-                unrendered.data = current_app.pushrod.normalize(unrendered.response)
+                unrendered.data = current_app.extensions['pushrod'].normalize(unrendered.response)
             return f(unrendered, **kwargs)
 
         return wrapper
