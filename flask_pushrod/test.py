@@ -13,6 +13,8 @@ from .renderers.jinja2 import jinja2_renderer
 from unittest import TestCase
 import json
 
+import logging
+
 
 test_response_str = """
 {
@@ -38,6 +40,11 @@ def repr_renderer(unrendered, **kwargs):
     return unrendered.rendered(repr(unrendered.response), "text/plain")
 
 
+def test_logging_no_app():
+    pushrod = Pushrod()
+    assert pushrod.logger == logging
+
+
 class PushrodTestCase(TestCase):
     def setUp(self):
         app = Flask(__name__,
@@ -51,9 +58,22 @@ class PushrodTestCase(TestCase):
         self.app = app
         self.client = app.test_client()
 
+        if not hasattr(self, 'app_contexts'):
+            self.app_contexts = []
+        app_context = app.app_context()
+        app_context.push()
+        self.app_contexts.append(app_context)
+
+    def tearDown(self):
+        self.app_contexts.pop().pop()
+
     def setup_method(self, method):
         # Setup for py.test
         return self.setUp()
+
+    def teardown_method(self, method):
+        # Setup for py.test
+        return self.tearDown()
 
 
 class PushrodResolverTestCase(PushrodTestCase):
@@ -188,6 +208,89 @@ class PushrodResolverTestCase(PushrodTestCase):
 
         assert u'aaa' in response_json
         assert response_json[u'aaa'] == u"hi"
+
+
+class PushrodNormalizerTestCase(PushrodTestCase):
+    def test_basestring_normalizer(self):
+        from_unicode = self.app.pushrod.normalize(u"testing string")
+        from_str = self.app.pushrod.normalize("testing string")
+
+        assert from_unicode == u"testing string"
+        assert from_str == u"testing string"
+
+    def test_number_normalizer(self):
+        assert self.app.pushrod.normalize(10) == 10
+        assert self.app.pushrod.normalize(500L) == 500L
+        assert self.app.pushrod.normalize(20.5) == 20.5
+
+    def test_bool_normalizer(self):
+        assert self.app.pushrod.normalize(True) == True
+
+    def test_none_normalizer(self):
+        assert self.app.pushrod.normalize(None) == None
+
+    def test_iterable_normalizer(self):
+        in_list = ["test string", 57]
+
+        from_list = self.app.pushrod.normalize(in_list)
+        from_tuple = self.app.pushrod.normalize(tuple(in_list))
+
+        assert from_list == in_list
+        assert from_tuple == in_list
+
+    def test_dict_normalizer(self):
+        in_dict = {
+            "hi": 54,
+            "bleh": "testable",
+            "no": ["12"],
+        }
+
+        assert self.app.pushrod.normalize(in_dict) == in_dict
+
+    def test_delegate_normalizer(self):
+        class MyClass(object):
+            __pushrod_field__ = "value"
+
+            def __init__(self):
+                self.value = 53.21
+
+        my_instance = MyClass()
+
+        assert self.app.pushrod.normalize(my_instance) == self.app.pushrod.normalize(my_instance.value)
+
+    def test_no_normalizer(self):
+        class MyClass(object):
+            pass
+
+        assert self.app.pushrod.normalize(MyClass()) == NotImplemented
+
+        self.app.pushrod.normalizer_fallbacks[MyClass] = lambda x, pushrod: NotImplemented
+
+        assert self.app.pushrod.normalize(MyClass()) == NotImplemented
+
+    def test_normalizer_method(self):
+        class MyClass(object):
+            def __pushrod_normalize__(self, pushrod):
+                return u"Normalized!"
+
+        assert self.app.pushrod.normalize(MyClass()) == u"Normalized!"
+
+    def test_normalizer_generated_dict(self):
+        class MyClass(object):
+            __pushrod_fields__ = ["one", "three"]
+
+            def __init__(self, one, two, three):
+                self.one = one
+                self.two = two
+                self.three = three
+
+        assert self.app.pushrod.normalize(MyClass('first', 'second', 'third')) == {u'one': u'first', u'three': u'third'}
+
+    def test_normalizer_override(self):
+        self.app.pushrod.normalizer_overrides[int].append(lambda x, pushrod: unicode(x) if x > 0 else NotImplemented)
+
+        assert self.app.pushrod.normalize(0) == 0
+        assert self.app.pushrod.normalize(1) == u"1"
 
 
 class PushrodRendererTestCase(PushrodTestCase):
