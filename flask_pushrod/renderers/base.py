@@ -1,6 +1,8 @@
 from werkzeug.exceptions import NotAcceptable
 
-from flask import Response
+from flask import current_app, Response
+
+from functools import wraps
 
 
 class UnrenderedResponse(object):
@@ -26,7 +28,7 @@ class UnrenderedResponse(object):
             mime_type)
 
 
-def renderer(name=None, mime_type=None):
+def renderer(name=None, mime_type=None, normalize=True):
     """
     Flags a function as a Pushrod renderer.
 
@@ -35,6 +37,7 @@ def renderer(name=None, mime_type=None):
 
     :param name: A :obj:`basestring` or a tuple of basestrings to match against when explicitly requested in the query string
     :param mime_type: A :obj:`basestring` or a tuple of basestrings to match against against when using HTTP content negotiation
+    :param normalize: If True then the unrendered response will be passed through :meth:`flask.ext.pushrod.Pushrod.normalize`
     """
 
     if not name:  # pragma: no cover
@@ -52,7 +55,13 @@ def renderer(name=None, mime_type=None):
         f.renderer_names = name
         f.renderer_mime_types = mime_type
 
-        return f
+        @wraps(f)
+        def wrapper(unrendered, **kwargs):
+            if normalize:
+                unrendered.data = current_app.pushrod.normalize(unrendered.response)
+            return f(unrendered, **kwargs)
+
+        return wrapper
 
     return decorator
 
