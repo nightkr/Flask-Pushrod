@@ -35,7 +35,7 @@ test_response_str = """
 test_response = eval(test_response_str)
 
 
-@renderer('repr')
+@renderer('repr', normalize=False)
 def repr_renderer(unrendered, **kwargs):
     return unrendered.rendered(repr(unrendered.response), "text/plain")
 
