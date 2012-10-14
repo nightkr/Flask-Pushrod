@@ -92,7 +92,7 @@ That's it. While it might seem a bit longer than the regular non-Pushrod code, y
 Making Your Own Renderer
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-Sometimes the available Pushrod renderers might not meet your requirements. Fortunately, making your own renderer is very easy. Let's say you want a renderer that passes the response through :func:`~repr.repr`, it would look somewhat like this::
+Sometimes the available Pushrod renderers might not meet your requirements. Fortunately, making your own renderer is very easy. Let's say you want a renderer that passes the response through :func:`~repr.repr`, it would look like this::
 
   from flask.ext.pushrod.renderers import renderer
 
