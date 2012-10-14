@@ -67,7 +67,7 @@ def setup_db(module):
         module.db.session.commit()
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     module = __import__(sys.argv[1])
     setup_db(module)
     module.app.run(debug=True)
