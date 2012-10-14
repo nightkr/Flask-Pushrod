@@ -63,9 +63,6 @@ The first step is to add a Pushrod resolver and decorate the view with the :func
   	app.run()
 
 .. warning::
-   While bare strings and Response objects are passed through unchanged, the (response, status, headers)-tuples are not; they are instead used to construct :class:`~flask.ext.pushrod.renderers.UnrenderedResponse` objects.
-
-.. warning::
    Remember to add the :func:`~flask.ext.pushrod.pushrod_view` decorator closer to the function definition than the :meth:`~flask.Flask.route` decorator.
 
 While this works and all, we get absolutely no benefit from using Pushrod right now. So let's let Pushrod handle the rendering::

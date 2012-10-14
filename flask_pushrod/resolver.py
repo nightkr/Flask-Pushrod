@@ -167,15 +167,16 @@ class Pushrod(object):
         if renderer_kwargs is None:
             renderer_kwargs = {}
 
+        if isinstance(response, tuple):
+            response, status, headers = response
+        else:
+            status = headers = None
+
         if isinstance(response, (basestring, BaseResponse)):
             return response
 
         if not isinstance(response, UnrenderedResponse):
-            if isinstance(response, tuple):
-                response, status, headers = response
-                response = UnrenderedResponse(response, status, headers)
-            else:
-                response = UnrenderedResponse(response)
+            response = UnrenderedResponse(response, status, headers)
 
         for renderer in renderers:
             rendered = renderer(response, **renderer_kwargs)
