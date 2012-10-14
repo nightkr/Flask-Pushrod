@@ -95,16 +95,6 @@ class Pushrod(object):
 
         app.extensions['pushrod'] = self
 
-        def get_pushrod_extension(self):
-            msg = "Accessing the Pushrod object by using app.pushrod is deprecated, use app.extensions['pushrod']"
-
-            if self.testing:
-                raise DeprecationWarning(msg)
-            else:
-                warnings.warn(msg, DeprecationWarning, stacklevel=2)
-            return self.extensions['pushrod']
-        Flask.pushrod = property(get_pushrod_extension)
-
     def register_renderer(self, renderer, default=False):
         """
         Registers a renderer with the Pushrod resolver (can also be done by passing the renderer to the constructor).

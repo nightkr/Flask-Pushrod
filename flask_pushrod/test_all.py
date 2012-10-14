@@ -79,14 +79,6 @@ class PushrodTestCase(TestCase):
 
 
 class PushrodResolverTestCase(PushrodTestCase):
-    @raises(DeprecationWarning)
-    def test_get_app_dot_pushrod_in_testing(self):
-        self.app.pushrod
-
-    def test_get_app_dot_pushrod_out_of_testing(self):
-        self.app.testing = False
-        assert self.app.pushrod == self.pushrod
-
     def test_raw_dict_response_data(self):
         @self.app.route("/raw_dict")
         @pushrod_view()
