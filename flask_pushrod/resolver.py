@@ -1,4 +1,4 @@
-from flask import Flask, current_app, request as current_request
+from flask import current_app, request as current_request
 from werkzeug.wrappers import BaseResponse
 
 from . import renderers as _renderers, normalizers
@@ -8,7 +8,6 @@ from functools import wraps
 from collections import defaultdict
 
 import logging
-import warnings
 
 from types import NoneType
 
@@ -217,6 +216,9 @@ class Pushrod(object):
         |:obj:`None`      |Passed through                                             |
         +-----------------+-----------------------------------------------------------+
 
+        .. note::
+           Both obj.__pushrod_fields__ and obj.__pushrod_field__ can also be callables, in which case they are called and their return value is used as if they were regular values.
+
         :param obj: The object to normalize.
         """
 
@@ -226,14 +228,9 @@ class Pushrod(object):
                 if attempt is not NotImplemented:
                     return attempt
 
-        if hasattr(obj, '__pushrod_normalize__'):
-            return obj.__pushrod_normalize__(self)
-
-        if hasattr(obj, '__pushrod_fields__'):
-            return self.normalize(dict((name, self.normalize(getattr(obj, name))) for name in obj.__pushrod_fields__))
-
-        if hasattr(obj, '__pushrod_field__'):
-            return self.normalize(getattr(obj, obj.__pushrod_field__))
+        attempt = normalizers.normalize_object(obj, self)
+        if attempt is not NotImplemented:
+            return attempt
 
         for cls in type(obj).__mro__:
             if cls in self.normalizer_fallbacks:
