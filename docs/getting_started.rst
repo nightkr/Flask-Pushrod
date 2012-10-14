@@ -129,7 +129,7 @@ While the shown examples might look neat for simple data, it can quickly get out
 Enter Normalizers
 ^^^^^^^^^^^^^^^^^
 
-As you can see that quickly starts looking redundant, and *stupid*. It's also going to cause problems if you're going to do any form validation using, say, `Flask-WTF`_, or anything else that, while working perfectly for an API too, has special helpers for the GUI rendering. To help with all these cases Flask-Pushrod has something called "normalizers". Normalizers are callables that take two arguments (the object and the :class:`~flask.ext.pushrod.Pushrod` instance) and prepare the data for serialization (see :meth:`~flask.ext.pushrod.Pushrod.normalize`). If a normalizer returns :obj:`NotImplemented` then the value is passed through to the next normalizer.
+As you can see that quickly starts looking redundant, and *stupid*. It's also going to cause problems if you're going to do any form validation using, say, `Flask-WTF`_, or anything else that, while working perfectly for an API too, has special helpers for the GUI rendering. To help with these cases Flask-Pushrod has something called "normalizers". Normalizers are callables that take two arguments (the object and the :class:`~flask.ext.pushrod.Pushrod` instance) and prepare the data for serialization (see :meth:`~flask.ext.pushrod.Pushrod.normalize`). If a normalizer returns :obj:`NotImplemented` then the value is passed through to the next normalizer.
 
 
 .. warning::
