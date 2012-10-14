@@ -31,7 +31,11 @@ setup(
     ],
     tests_require=[
         'pytest>=2.2.4',
-        'nose>=1.2.1'
+        'nose>=1.2.1',
+
+        # For example
+        'sqlalchemy>=0.7.9',
+        'flask-sqlalchemy>=0.16',
     ],
     cmdclass={'test': PyTest},
     classifiers=[
