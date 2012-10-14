@@ -9,6 +9,8 @@ from collections import defaultdict
 
 import logging
 
+import datetime
+
 from types import NoneType
 
 
@@ -65,6 +67,9 @@ class Pushrod(object):
             float: normalizers.normalize_float,
             bool: normalizers.normalize_bool,
             NoneType: normalizers.normalize_none,
+            datetime.datetime: normalizers.normalize_basestring,
+            datetime.date: normalizers.normalize_basestring,
+            datetime.time: normalizers.normalize_basestring,
         }
 
         #: The current app, only set from the constructor, not if using :meth:`init_app`.
@@ -190,31 +195,37 @@ class Pushrod(object):
         - obj.__pushrod_normalize__, should be a callable taking the :class:`Pushrod` instance as an argument argument
         - obj.__pushrod_fields__, a :obj:`dict` is built where the key name is the field name and the value is ran normalized
         - obj.__pushrod_field__, a value which is normalized instead of obj
-        - :attr:`self.normalizer_fallbacks[type(obj)] <normalizer_fallbacks` (taking parent classes into account), should be a callable taking (obj, pushrod), falls through on :obj:`NotImplemented`
+        - :attr:`self.normalizer_fallbacks[type(obj)] <normalizer_fallbacks>` (taking parent classes into account), should be a callable taking (obj, pushrod), falls through on :obj:`NotImplemented`
 
         These are the default fallbacks:
 
-        +-----------------+-----------------------------------------------------------+
-        |Type             |Behaviour                                                  |
-        +=================+===========================================================+
-        |:obj:`basestring`|Converted to :obj:`unicode`                                |
-        +-----------------+-----------------------------------------------------------+
-        |:obj:`list`      |Values are normalized                                      |
-        +-----------------+-----------------------------------------------------------+
-        |:obj:`tuple`     |Converted to :obj:`list`, then normalized again            |
-        +-----------------+-----------------------------------------------------------+
-        |:obj:`dict`      |Keys are converted to :obj:`unicode`, values are normalized|
-        +-----------------+-----------------------------------------------------------+
-        |:obj:`int`       |Passed through                                             |
-        +-----------------+-----------------------------------------------------------+
-        |:obj:`long`      |Passed through                                             |
-        +-----------------+-----------------------------------------------------------+
-        |:obj:`float`     |Passed through                                             |
-        +-----------------+-----------------------------------------------------------+
-        |:obj:`bool`      |Passed through                                             |
-        +-----------------+-----------------------------------------------------------+
-        |:obj:`None`      |Passed through                                             |
-        +-----------------+-----------------------------------------------------------+
+        +---------------------------+-----------------------------------------------------------+
+        |Type                       |Behaviour                                                  |
+        +===========================+===========================================================+
+        |:obj:`basestring`          |Converted to :obj:`unicode`                                |
+        +---------------------------+-----------------------------------------------------------+
+        |:obj:`list`                |Values are normalized                                      |
+        +---------------------------+-----------------------------------------------------------+
+        |:obj:`tuple`               |Converted to :obj:`list`, then normalized again            |
+        +---------------------------+-----------------------------------------------------------+
+        |:obj:`dict`                |Keys are converted to :obj:`unicode`, values are normalized|
+        +---------------------------+-----------------------------------------------------------+
+        |:obj:`int`                 |Passed through                                             |
+        +---------------------------+-----------------------------------------------------------+
+        |:obj:`long`                |Passed through                                             |
+        +---------------------------+-----------------------------------------------------------+
+        |:obj:`float`               |Passed through                                             |
+        +---------------------------+-----------------------------------------------------------+
+        |:obj:`bool`                |Passed through                                             |
+        +---------------------------+-----------------------------------------------------------+
+        |:obj:`None`                |Passed through                                             |
+        +---------------------------+-----------------------------------------------------------+
+        |:class:`~datetime.datetime`|Converted to :obj:`unicode`                                |
+        +---------------------------+-----------------------------------------------------------+
+        |:class:`~datetime.date`    |Converted to :obj:`unicode`                                |
+        +---------------------------+-----------------------------------------------------------+
+        |:class:`~datetime.time`    |Converted to :obj:`unicode`                                |
+        +---------------------------+-----------------------------------------------------------+
 
         .. note::
            Both obj.__pushrod_fields__ and obj.__pushrod_field__ can also be callables, in which case they are called and their return value is used as if they were regular values.
