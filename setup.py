@@ -31,6 +31,7 @@ setup(
     ],
     tests_require=[
         'pytest>=2.2.4',
+        'nose>=1.2.1'
     ],
     cmdclass={'test': PyTest},
     classifiers=[
