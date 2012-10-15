@@ -16,12 +16,12 @@ class PyTest(TestCommand):
 
 setup(
     name='Flask-Pushrod',
-    version='0.1-dev',
+    version='0.1.dev',
     url='http://github.com/dontcare4free/flask-pushrod',
     license='MIT',
     author='Nullable',
     author_email='teo@nullable.se',
-    description='An API microframework based on the idea of that the UI is just yet another endpoint',
+    description='An API microframework based on the idea of that the UI is just yet another API endpoint',
     packages=['flask_pushrod', 'flask_pushrod.renderers'],
     zip_safe=False,
     platforms='any',
