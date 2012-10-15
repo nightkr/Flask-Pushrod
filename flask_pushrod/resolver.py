@@ -194,43 +194,9 @@ class Pushrod(object):
         The resolution order looks like this:
 
         - Loop through :attr:`self.normalizer_overrides[type(obj)] <normalizer_overrides>` (taking parent classes into account), should be a callable taking (obj, pushrod), falls through on :obj:`NotImplemented`
-        - obj.__pushrod_normalize__, should be a callable taking the :class:`Pushrod` instance as an argument argument
-        - obj.__pushrod_fields__, a :obj:`dict` is built where the key name is the field name and the value is ran normalized
-        - obj.__pushrod_field__, a value which is normalized instead of obj
         - :attr:`self.normalizers[type(obj)] <normalizers>` (taking parent classes into account), should be a callable taking (obj, pushrod), falls through on :obj:`NotImplemented`
 
-        These are the default fallbacks:
-
-        +---------------------------+-----------------------------------------------------------+
-        |Type                       |Behaviour                                                  |
-        +===========================+===========================================================+
-        |:obj:`basestring`          |Converted to :obj:`unicode`                                |
-        +---------------------------+-----------------------------------------------------------+
-        |:obj:`list`                |Values are normalized                                      |
-        +---------------------------+-----------------------------------------------------------+
-        |:obj:`tuple`               |Converted to :obj:`list`, then normalized again            |
-        +---------------------------+-----------------------------------------------------------+
-        |:obj:`dict`                |Keys are converted to :obj:`unicode`, values are normalized|
-        +---------------------------+-----------------------------------------------------------+
-        |:obj:`int`                 |Passed through                                             |
-        +---------------------------+-----------------------------------------------------------+
-        |:obj:`long`                |Passed through                                             |
-        +---------------------------+-----------------------------------------------------------+
-        |:obj:`float`               |Passed through                                             |
-        +---------------------------+-----------------------------------------------------------+
-        |:obj:`bool`                |Passed through                                             |
-        +---------------------------+-----------------------------------------------------------+
-        |:obj:`None`                |Passed through                                             |
-        +---------------------------+-----------------------------------------------------------+
-        |:class:`~datetime.datetime`|Converted to :obj:`unicode`                                |
-        +---------------------------+-----------------------------------------------------------+
-        |:class:`~datetime.date`    |Converted to :obj:`unicode`                                |
-        +---------------------------+-----------------------------------------------------------+
-        |:class:`~datetime.time`    |Converted to :obj:`unicode`                                |
-        +---------------------------+-----------------------------------------------------------+
-
-        .. note::
-           Both obj.__pushrod_fields__ and obj.__pushrod_field__ can also be callables, in which case they are called and their return value is used as if they were regular values.
+        See :ref:`default-normalizers` for all default normalizers.
 
         :param obj: The object to normalize.
         """
@@ -257,6 +223,9 @@ class Pushrod(object):
 def pushrod_view(**renderer_kwargs):
     """
     Decorator that wraps view functions and renders their responses through :meth:`flask.ext.pushrod.Pushrod.render_response`.
+
+    .. note::
+       Views should only return :obj:`dicts <dict>` or a type that :meth:`normalizes <Pushrod.normalize>` down to :obj:`dicts <dict>`.
 
     :param renderer_kwargs: Any extra arguments to pass to the renderer
     """
