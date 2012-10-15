@@ -144,7 +144,7 @@ An example normalizer could look like this::
       else:
           return 0
 
-This would return 0 for all "falsy" values, but let all "trueish" values normalize as usual. It could then be registered like this::
+This would return 0 for all "falsy" values, but let all other values normalize as usual. It could then be registered like this::
 
     app = Flask(__name__)
     pushrod = Pushrod(app)
