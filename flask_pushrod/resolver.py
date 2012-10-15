@@ -196,7 +196,7 @@ class Pushrod(object):
         - Loop through :attr:`self.normalizer_overrides[type(obj)] <normalizer_overrides>` (taking parent classes into account), should be a callable taking (obj, pushrod), falls through on :obj:`NotImplemented`
         - :attr:`self.normalizers[type(obj)] <normalizers>` (taking parent classes into account), should be a callable taking (obj, pushrod), falls through on :obj:`NotImplemented`
 
-        See :ref:`default-normalizers` for all default normalizers.
+        See :ref:`bundled-normalizers` for all default normalizers.
 
         :param obj: The object to normalize.
         """
