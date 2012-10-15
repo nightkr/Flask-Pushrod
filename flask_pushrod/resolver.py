@@ -11,7 +11,7 @@ import logging
 
 import datetime
 
-from types import NoneType
+from types import NoneType, GeneratorType
 
 
 class Pushrod(object):
@@ -61,6 +61,7 @@ class Pushrod(object):
             basestring: normalizers.normalize_basestring,
             list: normalizers.normalize_iterable,
             tuple: normalizers.normalize_iterable,
+            GeneratorType: normalizers.normalize_iterable,
             dict: normalizers.normalize_dict,
             int: normalizers.normalize_int,
             long: normalizers.normalize_int,
