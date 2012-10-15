@@ -266,7 +266,7 @@ class PushrodNormalizerTestCase(PushrodTestCase):
 
         assert self.pushrod.normalize(MyClass()) == NotImplemented
 
-        self.pushrod.normalizer_fallbacks[MyClass] = lambda x, pushrod: NotImplemented
+        self.pushrod.normalizers[MyClass] = lambda x, pushrod: NotImplemented
 
         assert self.pushrod.normalize(MyClass()) == NotImplemented
 

@@ -79,7 +79,7 @@ def normalize_pagination(x, pushrod):
         'items': x.items,
     })
 
-pushrod.normalizer_fallbacks.update({
+pushrod.normalizers.update({
     Author: normalize_author,
     Post: normalize_post,
     Comment: normalize_comment,

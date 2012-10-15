@@ -57,7 +57,7 @@ class Pushrod(object):
         #: All items should be lists of callables. All values default to an empty list.
         self.normalizer_overrides = defaultdict(lambda: [])
         #: Hooks for providing a class with a fallback normalizer, which is called only if it doesn't define one. All items should be callables.
-        self.normalizer_fallbacks = {
+        self.normalizers = {
             basestring: normalizers.normalize_basestring,
             list: normalizers.normalize_iterable,
             tuple: normalizers.normalize_iterable,
@@ -196,7 +196,7 @@ class Pushrod(object):
         - obj.__pushrod_normalize__, should be a callable taking the :class:`Pushrod` instance as an argument argument
         - obj.__pushrod_fields__, a :obj:`dict` is built where the key name is the field name and the value is ran normalized
         - obj.__pushrod_field__, a value which is normalized instead of obj
-        - :attr:`self.normalizer_fallbacks[type(obj)] <normalizer_fallbacks>` (taking parent classes into account), should be a callable taking (obj, pushrod), falls through on :obj:`NotImplemented`
+        - :attr:`self.normalizers[type(obj)] <normalizers>` (taking parent classes into account), should be a callable taking (obj, pushrod), falls through on :obj:`NotImplemented`
 
         These are the default fallbacks:
 
@@ -245,8 +245,8 @@ class Pushrod(object):
             return attempt
 
         for cls in type(obj).__mro__:
-            if cls in self.normalizer_fallbacks:
-                attempt = self.normalizer_fallbacks[cls](obj, self)
+            if cls in self.normalizers:
+                attempt = self.normalizers[cls](obj, self)
                 if attempt is not NotImplemented:
                     return attempt
 

@@ -59,7 +59,7 @@ def normalize_pagination(x, pushrod):
         'items': x.items,
     })
 
-pushrod.normalizer_fallbacks[Pagination] = normalize_pagination
+pushrod.normalizers[Pagination] = normalize_pagination
 
 
 @app.route("/")

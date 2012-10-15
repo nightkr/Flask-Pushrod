@@ -148,13 +148,13 @@ This would return 0 for all "falsy" values, but let all "trueish" values normali
 
     app = Flask(__name__)
     pushrod = Pushrod(app)
-    pushrod.normalizer_fallbacks[object] = my_normalizer
+    pushrod.normalizers[object] = my_normalizer
 
 .. note::
-   There is also :attr:`~flask.ext.pushrod.Pushrod.normalizer_overrides`. The difference is that :attr:`~flask.ext.pushrod.Pushrod.normalizer_fallbacks` is a :obj:`dict` of callables that should be used for the "standard" case, while :attr:`~flask.ext.pushrod.Pushrod.normalizer_overrides` is a :obj:`dict` of :obj:`lists <list>` of callables should be used when you need to override the behaviour for a subset of cases.
+   There is also :attr:`~flask.ext.pushrod.Pushrod.normalizer_overrides`. The difference is that :attr:`~flask.ext.pushrod.Pushrod.normalizers` is a :obj:`dict` of callables that should be used for the "standard" case, while :attr:`~flask.ext.pushrod.Pushrod.normalizer_overrides` is a :obj:`dict` of :obj:`lists <list>` of callables should be used when you need to override the behaviour for a subset of cases.
 
 .. note::
-   Both :attr:`~flask.ext.pushrod.Pushrod.normalizer_overrides` and :attr:`~flask.ext.pushrod.Pushrod.normalizer_fallbacks` are resolved in the regular "MRO" (method resolution order). Normalization is resolved in the same order as method calls.
+   Both :attr:`~flask.ext.pushrod.Pushrod.normalizer_overrides` and :attr:`~flask.ext.pushrod.Pushrod.normalizers` are resolved in the regular "MRO" (method resolution order). Normalization is resolved in the same order as method calls.
 
 .. note::
    :attr:`~flask.ext.pushrod.Pushrod.normalizer_overrides` is a :class:`~collections.defaultdict`, so there is no need to create the :obj:`list` yourself.
