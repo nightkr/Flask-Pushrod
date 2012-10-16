@@ -22,6 +22,7 @@ setup(
     author='Nullable',
     author_email='teo@nullable.se',
     description='An API microframework based on the idea of that the UI is just yet another API endpoint',
+    long_description=open('README.rst').read(),
     packages=['flask_pushrod', 'flask_pushrod.renderers'],
     zip_safe=False,
     platforms='any',

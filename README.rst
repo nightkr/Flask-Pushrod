@@ -13,9 +13,8 @@ Since Flask-Pushrod is still very early in development there is currently no off
 Usage
 -----
 
-A simple hello world app in Pushrod would look like this:
+A simple hello world app in Pushrod would look like this::
 
-```python
 from flask import Flask, render_template
 from flask.ext.pushrod import Pushrod, pushrod_view
 
@@ -35,16 +34,16 @@ def hello():
 
 if __name__ == "__main__":
       app.run()
-```
 
 This would, depending on the request, return either the greeting message in JSON or render it through the Jinja2 `hello.html` template.
 
 Tests
 -----
 
-```bash
+::
+
 $ python setup.py test
-```
+
 
 Documentation
 -------------
