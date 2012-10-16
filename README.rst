@@ -17,25 +17,25 @@ Usage
 
 A simple hello world app in Pushrod would look like this::
 
-from flask import Flask, render_template
-from flask.ext.pushrod import Pushrod, pushrod_view
+	from flask import Flask, render_template
+	from flask.ext.pushrod import Pushrod, pushrod_view
 
-import random
-
-
-app = Flask(__name__)
-Pushrod(app)
+	import random
 
 
-@app.route("/")
-@pushrod_view(jinja_template="hello.html")
-def hello():
-      return {
-              'greeting': random.choice(("Hi", "Heya"))
-      }
+	app = Flask(__name__)
+	Pushrod(app)
 
-if __name__ == "__main__":
-      app.run()
+
+	@app.route("/")
+	@pushrod_view(jinja_template="hello.html")
+	def hello():
+	    return {
+	        'greeting': random.choice(("Hi", "Heya"))
+	    }
+
+	if __name__ == "__main__":
+	    app.run()
 
 This would, depending on the request, return either the greeting message in JSON or render it through the Jinja2 `hello.html` template.
 
