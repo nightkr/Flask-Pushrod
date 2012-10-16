@@ -1,7 +1,9 @@
 Flask-Pushrod
 =============
 
-[![Build Status](https://secure.travis-ci.org/dontcare4free/Flask-Pushrod.png)](http://travis-ci.org/dontcare4free/Flask-Pushrod)
+.. image:: https://secure.travis-ci.org/dontcare4free/Flask-Pushrod.png
+   :alt: Build Status
+   :target: http://travis-ci.org/dontcare4free/Flask-Pushrod
 
 Flask-Pushrod is a simple helper for Flask for doing content negotiation (primarily for running the API and the website on the same code-base, with as little separate handling as possible).
 
@@ -48,4 +50,4 @@ $ python setup.py test
 Documentation
 -------------
 
-More advanced documentation [is available on Read The Docs](http://flask-pushrod.rtfd.org/).
+More advanced documentation `is available on Read The Docs <http://flask-pushrod.rtfd.org/>`_.
