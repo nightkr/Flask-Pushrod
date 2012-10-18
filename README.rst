@@ -10,7 +10,17 @@ Flask-Pushrod is a simple helper for Flask for doing content negotiation (primar
 Installation
 ------------
 
-Since Flask-Pushrod is still very early in development there is currently no official release available.
+Flask-Pushrod is available on PyPI, so to install the latest stable version simply run
+
+::
+
+    pip install Flask-Pushrod
+
+or
+
+::
+
+    easy_install Flask-Pushrod
 
 Usage
 -----
