@@ -1,6 +1,8 @@
 from setuptools import setup
 from setuptools.command.test import test as TestCommand
 
+from os import path
+
 
 class PyTest(TestCommand):
     def finalize_options(self):
@@ -16,13 +18,13 @@ class PyTest(TestCommand):
 
 setup(
     name='Flask-Pushrod',
-    version='0.1.1',
+    version='0.1.2',
     url='http://github.com/dontcare4free/flask-pushrod',
     license='MIT',
     author='Nullable',
     author_email='teo@nullable.se',
     description='An API microframework based on the idea of that the UI is just yet another API endpoint',
-    long_description=open('README.rst').read(),
+    long_description=open(path.join(path.dirname(path.abspath(__file__)), 'README.rst')).read(),
     packages=['flask_pushrod', 'flask_pushrod.renderers'],
     zip_safe=False,
     platforms='any',
