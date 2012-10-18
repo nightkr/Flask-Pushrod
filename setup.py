@@ -16,7 +16,7 @@ class PyTest(TestCommand):
 
 setup(
     name='Flask-Pushrod',
-    version='0.1.dev',
+    version='0.1',
     url='http://github.com/dontcare4free/flask-pushrod',
     license='MIT',
     author='Nullable',
