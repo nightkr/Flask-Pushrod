@@ -118,6 +118,11 @@ class Pushrod(object):
         """
         Inspects a Flask :class:`~flask.Request` for hints regarding what renderer to use.
 
+        This is found out by first looking in the query string argument named after :attr:`~format_arg_name` (``format`` by default), and then matching the contents of the Accept:-header. If nothing is found anyway, then :attr:`~default_renderer` is used.
+
+        .. note::
+           If the query string argument is specified but doesn't exist (or fails), then the request fails immediately, without trying the other methods.
+
         :param request: The request to be inspected (defaults to :obj:`flask.request`)
         :returns: List of matching renderers, in order of user preference
         """

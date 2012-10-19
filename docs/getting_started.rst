@@ -89,6 +89,9 @@ While this works and all, we get absolutely no benefit from using Pushrod right 
 
 That's it. While it might seem a bit longer than the regular non-Pushrod code, you now get JSON rendering (and any other renderers you decide to enable) for free!
 
+.. note::
+   See :meth:`~flask.ext.pushrod.Pushrod.get_renderers_for_request` for more info on the resolution order.
+
 Making Your Own Renderer
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
