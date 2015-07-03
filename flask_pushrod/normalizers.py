@@ -6,6 +6,8 @@ Flask-Pushrod's built-in normalizers are generally named with the scheme :samp:`
 .. note::
    Normalizers also apply to subclasses, unless the subclass defines another normalizer.
 """
+from past.builtins import basestring
+from builtins import str
 
 
 def _call_if_callable(x, *args, **kwargs):
@@ -21,7 +23,7 @@ def normalize_basestring(x, pushrod):
       - :obj:`~datetime.date`
     :returns: :obj:`unicode`
     """
-    return unicode(x)
+    return str(x)
 
 
 def normalize_iterable(x, pushrod):
@@ -40,7 +42,7 @@ def normalize_dict(x, pushrod):
     :takes: :obj:`dict`
     :returns: :obj:`dict` with all keys converted to :obj:`unicode` and then :meth:`normalized <flask.ext.pushrod.Pushrod.normalize>` and all values :meth:`normalized <flask.ext.pushrod.Pushrod.normalize>`
     """
-    normalized = dict((pushrod.normalize(unicode(k)), pushrod.normalize(v)) for k, v in x.items())
+    normalized = dict((pushrod.normalize(str(k)), pushrod.normalize(v)) for k, v in x.items())
     return dict((k, v) for k, v in normalized.items() if v is not NotImplemented)
 
 

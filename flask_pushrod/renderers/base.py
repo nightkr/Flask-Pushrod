@@ -1,7 +1,6 @@
+from past.builtins import basestring
 from werkzeug.exceptions import NotAcceptable
-
 from flask import current_app, Response
-
 from functools import wraps
 
 

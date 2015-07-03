@@ -7,7 +7,7 @@ from os import path
 class PyTest(TestCommand):
     def finalize_options(self):
         TestCommand.finalize_options(self)
-        self.test_args = []
+        self.test_args = ['--verbose', '-s']
         self.test_suite = True
 
     def run_tests(self):
@@ -19,18 +19,18 @@ class PyTest(TestCommand):
 setup(
     name='Flask-Pushrod',
     version='0.2.dev',
-    url='http://github.com/dontcare4free/flask-pushrod',
+    url='http://github.com/opyate/flask-pushrod',
     license='MIT',
-    author='Nullable',
-    author_email='teo@nullable.se',
-    description='An API microframework based on the idea of that the UI is just yet another API endpoint',
+    author='Juan Uys',
+    author_email='opyate+flaskpushrod@gmail.com',
+    description='Views for your API',
     long_description=open(path.join(path.dirname(path.abspath(__file__)), 'README.rst')).read(),
     packages=['flask_pushrod', 'flask_pushrod.renderers'],
     zip_safe=False,
     platforms='any',
     install_requires=[
         'Werkzeug>=0.7',
-        'Flask>=0.9',
+        'Flask>=0.10.1',
     ],
     tests_require=[
         'pytest>=2.2.4',

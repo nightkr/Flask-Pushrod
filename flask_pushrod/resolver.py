@@ -1,3 +1,5 @@
+from past.builtins import basestring
+from past.builtins import long
 from flask import current_app, request as current_request
 from werkzeug.wrappers import BaseResponse
 
@@ -11,8 +13,9 @@ import logging
 
 import datetime
 
-from types import NoneType, GeneratorType
+from types import GeneratorType
 
+NoneType = type(None)
 
 class Pushrod(object):
     """
@@ -59,6 +62,7 @@ class Pushrod(object):
         #: Hooks for providing a class with a fallback normalizer, which is called only if it doesn't define one. All items should be callables.
         self.normalizers = {
             basestring: normalizers.normalize_basestring,
+            str: normalizers.normalize_basestring,
             list: normalizers.normalize_iterable,
             tuple: normalizers.normalize_iterable,
             GeneratorType: normalizers.normalize_iterable,
@@ -138,9 +142,15 @@ class Pushrod(object):
             else:
                 return []
 
-        matching_renderers = [self.mime_type_renderers[mime_type]
+        try:
+            matching_renderers = [self.mime_type_renderers[mime_type]
                                for mime_type in request.accept_mimetypes.itervalues()
                                if mime_type in self.mime_type_renderers]
+        except:
+            matching_renderers = [self.mime_type_renderers[mime_type]
+                               for mime_type in request.accept_mimetypes.values()
+                               if mime_type in self.mime_type_renderers]
+
 
         if self.default_renderer:
             matching_renderers.append(self.default_renderer)

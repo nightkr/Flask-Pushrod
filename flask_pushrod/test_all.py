@@ -1,3 +1,6 @@
+from __future__ import absolute_import
+from past.builtins import basestring
+from builtins import str
 from flask import Flask, Response, Request
 import flask
 
@@ -87,7 +90,7 @@ class PushrodResolverTestCase(PushrodTestCase):
 
         test_view_raw_dict_response = self.client.get("/raw_dict")
         assert test_view_raw_dict_response.status_code == 200
-        assert test_view_raw_dict_response.data == repr(test_response)
+        assert eval(test_view_raw_dict_response.data) == test_response
 
     def test_response_data(self):
         @self.app.route("/200_response")
@@ -102,11 +105,11 @@ class PushrodResolverTestCase(PushrodTestCase):
 
         test_view_200_response = self.client.get("/200_response")
         assert test_view_200_response.status_code == 200
-        assert test_view_200_response.data == repr(test_response)
+        assert test_view_200_response.data.decode('utf-8') == repr(test_response)
 
         test_view_404_response = self.client.get("/404_response")
         assert test_view_404_response.status_code == 404
-        assert test_view_404_response.data == repr(test_response)
+        assert test_view_404_response.data.decode('utf-8') == repr(test_response)
 
     def test_response_bypass(self):
         @self.app.route("/raw_string")
@@ -121,11 +124,11 @@ class PushrodResolverTestCase(PushrodTestCase):
 
         test_raw_string_response = self.client.get("/raw_string")
         assert test_raw_string_response.status_code == 200
-        assert test_raw_string_response.data == "test"
+        assert test_raw_string_response.data.decode('utf-8') == "test"
 
         test_regular_response_response = self.client.get("/regular_response")
         assert test_regular_response_response.status_code == 200
-        assert test_regular_response_response.data == "test"
+        assert test_regular_response_response.data.decode('utf-8') == "test"
 
     @raises(RendererNotFound)
     def test_renderer_not_found(self):
@@ -206,7 +209,7 @@ class PushrodResolverTestCase(PushrodTestCase):
         assert 'X-Aaa' in response.headers
         assert response.headers['X-Aaa'] == "Hi!"
 
-        response_json = json.loads(response.data)
+        response_json = json.loads(response.data.decode('utf-8'))
 
         assert u'aaa' in response_json
         assert response_json[u'aaa'] == u"hi"
@@ -222,7 +225,7 @@ class PushrodNormalizerTestCase(PushrodTestCase):
 
     def test_number_normalizer(self):
         assert self.pushrod.normalize(10) == 10
-        assert self.pushrod.normalize(500L) == 500L
+        assert self.pushrod.normalize(500) == 500
         assert self.pushrod.normalize(20.5) == 20.5
 
     def test_bool_normalizer(self):
@@ -295,7 +298,7 @@ class PushrodNormalizerTestCase(PushrodTestCase):
         assert self.pushrod.normalize(MyClass('first', 'second', 'third')) == {u'one': u'first', u'three': u'third'}
 
     def test_normalizer_override(self):
-        self.pushrod.normalizer_overrides[int].append(lambda x, pushrod: unicode(x) if x > 0 else NotImplemented)
+        self.pushrod.normalizer_overrides[int].append(lambda x, pushrod: str(x) if x > 0 else NotImplemented)
 
         assert self.pushrod.normalize(0) == 0
         assert self.pushrod.normalize(1) == u"1"
@@ -307,9 +310,9 @@ class PushrodRendererTestCase(PushrodTestCase):
         rendered = self.pushrod.render_response(
             test_response, json_renderer)
 
-        assert regular == rendered.data
+        assert regular == rendered.data.decode('utf-8')
 
-        json.loads(rendered.data)
+        json.loads(rendered.data.decode('utf-8'))
 
     @raises(RendererNotFound)
     def test_jinja_renderer_no_template(self):
@@ -328,7 +331,7 @@ class PushrodRendererTestCase(PushrodTestCase):
             rendered = self.pushrod.render_response(
                 test_response, jinja2_renderer, {'jinja_template': 'jinja.txt'})
 
-        assert regular == rendered.data, \
+        assert regular == rendered.data.decode('utf-8'), \
             "'%s' does not equal '%s'" % (rendered.data, regular)
 
         assert eval(rendered.data) == test_response
