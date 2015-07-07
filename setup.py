@@ -31,6 +31,7 @@ setup(
     install_requires=[
         'Werkzeug>=0.7',
         'Flask>=0.10.1',
+        'future'
     ],
     tests_require=[
         'pytest>=2.2.4',
