@@ -1,9 +1,12 @@
 Flask-Pushrod
 =============
 
-.. image:: https://secure.travis-ci.org/dontcare4free/Flask-Pushrod.png
+This repository is no longer maintained, please see [Opyate's fork](https://github.com/opyate/Flask-Pushrod) for the canonical version!
+--------------------
+
+.. image:: https://secure.travis-ci.org/teozkr/Flask-Pushrod.png
    :alt: Build Status
-   :target: http://travis-ci.org/dontcare4free/Flask-Pushrod
+   :target: http://travis-ci.org/teozkr/Flask-Pushrod
 
 Flask-Pushrod is a simple helper for Flask for doing content negotiation (primarily for running the API and the website on the same code-base, with as little separate handling as possible).
 
