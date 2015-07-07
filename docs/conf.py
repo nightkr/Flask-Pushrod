@@ -44,7 +44,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Flask-Pushrod'
-copyright = u'2012, Nullable'
+copyright = u'2012-2015, The Pushrod Developers'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -101,7 +101,7 @@ html_theme = 'pushrod'
 # documentation.
 html_theme_options = {
   'index_logo': None,
-  'github_fork': 'dontcare4free/Flask-Pushrod',
+  'github_fork': 'UYSio/Flask-Pushrod',
 }
 
 # Add any paths that contain custom themes here, relative to this directory.
@@ -190,7 +190,7 @@ latex_elements = {
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
   ('index', 'Flask-Pushrod.tex', u'Flask-Pushrod Documentation',
-   u'Nullable', 'manual'),
+   u'The Pushrod Developers', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -220,7 +220,7 @@ latex_documents = [
 # (source start file, name, description, authors, manual section).
 man_pages = [
     ('index', 'flask-pushrod', u'Flask-Pushrod Documentation',
-     [u'Nullable'], 1)
+     [u'The Pushrod Developers'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -234,7 +234,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
   ('index', 'Flask-Pushrod', u'Flask-Pushrod Documentation',
-   u'Nullable', 'Flask-Pushrod', 'One line description of project.',
+   u'The Pushrod Developers', 'Flask-Pushrod', 'One line description of project.',
    'Miscellaneous'),
 ]
 
