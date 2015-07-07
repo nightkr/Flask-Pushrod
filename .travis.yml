@@ -2,11 +2,13 @@ language: python
 python:
   - "2.6"
   - "2.7"
+  - "3.4"
   - "pypy"
+  - "pypy3"
 env:
-  - FLASK_VERSION=0.9
+  - FLASK_VERSION=0.10.1
 install:
   - "pip install -r requirements.txt --use-mirrors"
   - "pip install flask==$FLASK_VERSION --use-mirrors"
   - "pip install . --use-mirrors"
-script: "python setup.py test"
+script: "py.test --verbose -s flask_pushrod/test_all.py"
