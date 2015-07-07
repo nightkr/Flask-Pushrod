@@ -1,7 +1,7 @@
 Flask-Pushrod
 =============
 
-This repository is no longer maintained, please see Opyate's fork (https://github.com/opyate/Flask-Pushrod) for the canonical version!
+This repository is no longer maintained, please see Opyate's fork (https://github.com/UYSio/Flask-Pushrod) for the canonical version!
 --------------------
 
 .. image:: https://secure.travis-ci.org/teozkr/Flask-Pushrod.png
